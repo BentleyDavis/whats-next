@@ -1,0 +1,54 @@
+.hourly > table > tbody > tr > td,
+.hourly > table > thead > tr > th,
+.hourly > table > tbody > tr > th {
+  padding: 0 1em;
+  padding-bottom: 0.5em;
+  border: 3px solid #eee;
+}
+
+.hourly > table > thead > tr > th {
+  font-weight: normal;
+  text-align: center;
+  padding: 0;
+  background-color: white;
+  top: -1px;
+  z-index: 9999;
+}
+
+.hourly > table > tbody > tr > th {
+  font-weight: normal;
+  text-align: center;
+  padding: 0;
+  background-color: white;
+  top: -1px;
+  z-index: 9999;
+}
+
+.hourly > table {
+  border-collapse: separate; /* Don't collapse */
+  border-spacing: 0;
+}
+
+.hourly > table > tbody > tr:nth-child(6n-5),
+.hourly > table > tbody > tr:nth-child(6n-4) {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.when-narrow {
+  display: none;
+}
+
+@media (max-width: 600px) {
+  .when-wide {
+    display: none;
+  }
+  .when-narrow {
+    display: revert;
+  }
+
+  .hourly > table > tbody > tr > td,
+  .hourly > table > thead > tr > th {
+    padding: 0 0.5em;
+    border: 1px solid #eee;
+  }
+}

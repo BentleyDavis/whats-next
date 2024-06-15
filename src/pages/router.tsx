@@ -3,7 +3,7 @@ import ErrorPage from "./Error";
 import App from "./App";
 import HomePage from "./Home";
 import ExamplesPage from "./Examples";
-import ExamplePage from "./Example";
+import WeatherPage from "./Weather";
 
 
 export const router = createBrowserRouter([
@@ -21,8 +21,8 @@ export const router = createBrowserRouter([
                 element: <ExamplesPage />,
             },
             {
-                path: "/examples/:id/*",
-                element: <ExamplePage />,
+                path: "/weather",
+                element: <WeatherPage />,
             },
         ],
     },

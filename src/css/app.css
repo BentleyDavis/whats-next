@@ -1,0 +1,24 @@
+#root{
+    height: 100vh;
+}
+
+.pad-content{
+    padding: var(--padding-block) var(--padding-inline);
+    padding-right: calc(var(--padding-inline) - var(--scrollbar-width));
+}
+
+.page{
+    height: 100%;
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+
+    /* Used to separate the main content from any headers or footers */
+    border-top: 1px solid grey;
+    border-bottom: 1px solid grey;
+
+}

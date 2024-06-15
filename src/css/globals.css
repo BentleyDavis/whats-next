@@ -1,0 +1,41 @@
+:root {
+  --scrollbar-width: 4px;
+  --padding-block: 8px; /* top and bottom */
+  --padding-inline: 16px; /* left and right (includes scrollbar) */
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+#root{
+  height: 100vh;
+}
+
+body{
+  margin: 0;
+}
+
+.pad-content{
+  padding: var(--padding-block) var(--padding-inline);
+  padding-right: calc(var(--padding-inline) - var(--scrollbar-width));
+}
+
+.page{
+  height: 100%;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1;
+  overflow: auto;
+
+  /* Used to separate the main content from any headers or footers */
+  border-top: 1px solid var(--indigo200);
+  border-bottom: 1px solid var(--indigo200);
+
+}

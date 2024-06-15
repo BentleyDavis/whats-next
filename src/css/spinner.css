@@ -1,0 +1,11 @@
+.spinner {
+    animation: spinning 0.5s linear infinite;
+    border: 2px solid;
+    border-color: transparent currentColor currentColor transparent;
+    border-radius: 100%;
+    height: 1em;
+    width: 1em;
+    display: inline-block;
+    margin: 0 1em;
+    opacity: 0.5;
+  }

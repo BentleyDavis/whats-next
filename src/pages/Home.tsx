@@ -40,7 +40,7 @@ function HomePage() {
 
   const checklist = useLoaderData();
 
-  const [authState, setAuthState] = useState<"in" | "unknown">("unknown")
+  const [authState, setAuthState] = useState<"in" | "unknown" | "error">("unknown")
   // const [user, setUser] = useState<User>()
   const [formState, dispatchForm] = useReducer(formStateReducer, undefined)
   const [isAdmin, setisAdmin] = useState(false)
@@ -54,40 +54,46 @@ function HomePage() {
 
     const auth = getAuth();
     let unsubscribe = onAuthStateChanged(auth, async (incomingUser) => {
+      try {
 
-      if (incomingUser) {
-        setAuthState("in");
-        // setUser(incomingUser);
 
-        // Subscribe the survey data
-        const db = getFirestore(firebaseApp);
+        if (incomingUser) {
+          setAuthState("in");
+          // setUser(incomingUser);
 
-        // if (!dbDocRef) {
+          // Subscribe the survey data
+          const db = getFirestore(firebaseApp);
 
-        // create the doc if it doesn't exist
-        const docRef = doc(db, "lists", "AL3vE9W4KNpbHaZ03IGp", "submissions", dateId);
-        dbDocRef = docRef;
-        if (!(await getDoc(docRef)).exists()) {
-          await setDoc(docRef, {})
-        }
+          // if (!dbDocRef) {
 
-        const unsub = onSnapshot(docRef, (doc) => {
-
-          const data = doc.data();
-          if (data) {
-            if (data.updateFrom !== uniqueSessionId) {
-              dispatchForm({ path: "", data })
-            } else {
-            }
+          // create the doc if it doesn't exist
+          const docRef = doc(db, "lists", "AL3vE9W4KNpbHaZ03IGp", "submissions", dateId);
+          dbDocRef = docRef;
+          if (!(await getDoc(docRef)).exists()) {
+            await setDoc(docRef, {})
           }
-        });
 
-        cancelables.push(unsub)
-        // }
+          const unsub = onSnapshot(docRef, (doc) => {
 
-      } else {
-        const auth = getAuth();
-        signInWithRedirect(auth, provider).catch((error) => { console.error(error) });
+            const data = doc.data();
+            if (data) {
+              if (data.updateFrom !== uniqueSessionId) {
+                dispatchForm({ path: "", data })
+              } else {
+              }
+            }
+          });
+
+          cancelables.push(unsub)
+          // }
+
+        } else {
+          const auth = getAuth();
+          signInWithRedirect(auth, provider).catch((error) => { console.error(error) });
+        }
+      } catch (error) {
+        setAuthState("error");
+        console.error("error detected", error)
       }
     });
 
@@ -204,6 +210,15 @@ function HomePage() {
 
       {authState === "unknown" &&
         <h1>Checking login...</h1>
+      }
+
+      {authState === "error" && <>
+        <h1>Error</h1>
+        <br />
+        <p>This is an error. Tell Ben if this keeps hapening!</p>
+        <Button variant='warning' onClick={() => window.location.reload()}>Click here to try again</Button>
+        <br /><br /><br /><br /><br />
+      </>
       }
 
       <div style={{ opacity: .5 }}>v{config.version}</div>

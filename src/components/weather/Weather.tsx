@@ -25,7 +25,7 @@ const dateFormatter = new Intl.DateTimeFormat("en-US", {
     hour: "numeric",
 })
 
-function textToEmoji(shortForecast: string, isDaytime: boolean) {
+function textToEmoji(shortForecast: string,) {
     let emojis = ""
     if (shortForecast.includes("Mostly Sunny")) {
         emojis += "🌤️" //  Sun Behind Small Cloud
@@ -177,7 +177,7 @@ async function getWeather() {
                 // ).toFixed(0);
                 hourData.shadeΔ = hourData.feels - hourData.temperature;
                 hourData.hourText = dateFormatter.format(new Date(hourData.startTime));
-                hourData.emojiForecast = textToEmoji(hourData.shortForecast, hourData.isDaytime)
+                hourData.emojiForecast = textToEmoji(hourData.shortForecast)//, hourData.isDaytime)
                 hourlyData.push(hourData)
             }
 
@@ -227,7 +227,7 @@ export default function Weather({ elementData }: {
 
         async function _getWeather() {
             const hourlyData = await getWeather();
-            setWeather((w) => {
+            setWeather(() => {
                 return hourlyData
             })
         }

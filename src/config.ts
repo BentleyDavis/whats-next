@@ -1,5 +1,8 @@
+
 export const config = {
     hourToStartNewDay: 4,
+
+    version: "0.0.1",
 
     firebaseConfig: {
         apiKey: "AIzaSyCKdPURMoRaWjuqXD0tv5elgX8lU2gqopE",

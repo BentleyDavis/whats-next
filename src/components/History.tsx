@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ActionWhen } from "@/pages/App";
+import { ActionWhen } from "@/pages/Home";
 import { Button } from "react-bootstrap";
 
 const defaultShow = false;

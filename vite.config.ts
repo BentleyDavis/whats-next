@@ -15,7 +15,7 @@ export default defineConfig({
     },
 
     manifest: {
-      name: 'whats-next',
+      name: "What's Next",
       short_name: 'whats-next',
       description: 'whats-next',
       theme_color: '#ffffff',
@@ -26,6 +26,7 @@ export default defineConfig({
       cleanupOutdatedCaches: true,
       clientsClaim: true,
       skipWaiting: true,
+      navigateFallback: 'index.html',
     },
 
     devOptions: {

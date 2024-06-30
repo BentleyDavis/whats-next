@@ -1,3 +1,6 @@
+- old firebase  -   "firebase": "^10.12.2",
+
+
 # Creation steps
 - `npm create @vite-pwa/pwa@latest whats-next -- --template react-ts`
   - generateSW

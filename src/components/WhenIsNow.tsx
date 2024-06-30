@@ -26,25 +26,25 @@ export default function WhenIsNow({ elementData }: {
     elementData: any
 }) {
     const [now, setNow] = useState(new Date())
-    const [errorMessage, setErrorMessage] = useState("")
+    // const [errorMessage, setErrorMessage] = useState("")
 
 
     useEffect(() => {
         const id = setInterval(() => {
-            const oldNowText = localStorage.getItem(OldNowKey);
+            // const oldNowText = localStorage.getItem(OldNowKey);
             const newNow = new Date();
-            if (oldNowText) {
-                const oldNow = new Date(oldNowText);
-                if (newNow.getTime() - oldNow.getTime() > 60000) {
-                    setErrorMessage(() => { return "Needs Refresh" });
-                    localStorage.removeItem(OldNowKey);
-                    window.location.reload();
-                } else {
-                    localStorage.setItem(OldNowKey, newNow.toISOString());
-                }
-            } else {
-                localStorage.setItem(OldNowKey, newNow.toISOString());
-            }
+            // if (oldNowText) {
+            //     const oldNow = new Date(oldNowText);
+            //     if (newNow.getTime() - oldNow.getTime() > 60000) {
+            //         setErrorMessage(() => { return "Needs Refresh" });
+            //         localStorage.removeItem(OldNowKey);
+            //         window.location.reload();
+            //     } else {
+            //         localStorage.setItem(OldNowKey, newNow.toISOString());
+            //     }
+            // } else {
+            //     localStorage.setItem(OldNowKey, newNow.toISOString());
+            // }
             setNow(() => { return newNow });
 
         }, 1000)
@@ -73,6 +73,6 @@ export default function WhenIsNow({ elementData }: {
             </span>
 
         </div>
-        <div>{errorMessage}</div>
+        {/* <div>{errorMessage}</div> */}
     </div>
 }

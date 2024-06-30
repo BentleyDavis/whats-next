@@ -14,7 +14,7 @@ import { getDateId } from '@/utils/getDateId';
 import '@/components/tasks.css';
 import { Button } from 'react-bootstrap';
 import DesktopInteraction from '@/components/DesktopInteraction';
-import { config } from '@/config';
+import { appConfig } from '@/appConfig';
 
 export async function loader({ params }: { params: any }) {
   return params;
@@ -209,7 +209,7 @@ function HomePage() {
       }
 
       {authState === "unknown" &&
-        <h1>Checking login...</h1>
+        <h1>One Moment. Checking identity...</h1>
       }
 
       {authState === "error" && <>
@@ -221,7 +221,9 @@ function HomePage() {
       </>
       }
 
-      <div style={{ opacity: .5 }}>v{config.version}</div>
+
+
+      <div style={{ opacity: .3 }}>v{appConfig.version}</div>
     </div>
   );
 }

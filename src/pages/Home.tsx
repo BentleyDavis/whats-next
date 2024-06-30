@@ -2,7 +2,7 @@ import '@/App.css';
 import { useEffect, useReducer, useState } from 'react';
 import { surveyFormat } from '@/surveyFormat';
 import { firebaseApp, firebaseInit } from '@/utils/database';
-import { getAuth, GoogleAuthProvider, onAuthStateChanged, signInWithPopup, signInWithRedirect } from 'firebase/auth';
+import { getAuth, GoogleAuthProvider, onAuthStateChanged, signInWithPopup } from 'firebase/auth';
 import { doc, getDoc, onSnapshot, setDoc, updateDoc } from "firebase/firestore";
 import { getFirestore } from "firebase/firestore";
 import { newId } from '@/utils/newId';

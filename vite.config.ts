@@ -21,6 +21,16 @@ export default defineConfig({
       theme_color: '#ffffff',
       shortcuts: [
         {
+          name: "Checklist",
+          short_name: "Checklist",
+          description: "Checklist",
+          url: "/",
+          icons: [
+            { src: "icons/checklist_icon_256.png", sizes: "256x256", type: "image/png" },
+            { src: "icons/checklist_icon_512.png", sizes: "512x512", type: "image/png" },
+          ]
+        },
+        {
           name: "Weather",
           short_name: "Weather",
           description: "Todays Hourly Weather",

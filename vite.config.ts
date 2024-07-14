@@ -19,6 +19,18 @@ export default defineConfig({
       short_name: 'whats-next',
       description: 'whats-next',
       theme_color: '#ffffff',
+      shortcuts: [
+        {
+          name: "Weather",
+          short_name: "Weather",
+          description: "Todays Hourly Weather",
+          url: "/weather",
+          icons: [
+            { src: "icons/weather_icon_256.png", sizes: "256x256", type: "image/png" },
+            { src: "icons/weather_icon_512.png", sizes: "512x512", type: "image/png" },
+          ]
+        },
+      ],
     },
 
     workbox: {

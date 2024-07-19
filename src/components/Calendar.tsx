@@ -71,10 +71,12 @@ export default function Calendar({ }: {
         if (!when) return ('')
         const dif = when.getTime() - now.getTime()
         let result = 'in '
-        if (dif > (1000 * 60 * 60)) result += `${Math.floor(dif / 1000 / 60 / 60)} hours `
-        if (dif < (1000 * 60 * 60 * 2)) {
+        if (dif > (1000 * 60 * 60 * 2)) {
+            result += `${Math.round(dif / 1000 / 60 / 60)} hours `
+        } else {
+            result += `${Math.floor(dif / 1000 / 60 / 60)} hour `
             result += ` ${Math.floor(((dif) / 1000 / 60) % 60)} minutes `;
-            result += ` ${Math.floor(((dif) / 1000) % 60)} seconds `
+            // result += ` ${Math.floor(((dif) / 1000) % 60)} seconds `
         }
         return result;
     }

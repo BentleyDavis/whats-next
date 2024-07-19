@@ -6,12 +6,15 @@ import listPlugin from '@fullcalendar/list';
 import './calendar.css';
 import { EventApi } from '@fullcalendar/core';
 import React from 'react';
+import { useLocalStorage } from "@uidotdev/usehooks";
+
 
 const defaultShow = (new URLSearchParams(window.location.search)).get("cal") !== null ? true : false;
 const SoonIsHours = 8
 
 const sortEvents = (a: EventApi, b: EventApi) => {
-    return (a?.start?.getTime() ?? 0) - (b?.start?.getTime() ?? 0);
+    if (!a.start || !b.start) return 0;
+    return (new Date(a.start).getTime() ?? 0) - (new Date(b.start).getTime() ?? 0);
 };
 
 const FullCalendarMemo = React.memo((props: any) => {
@@ -29,20 +32,27 @@ export default function Calendar({ }: {
     elementData: any
 }) {
     const [show, setShow] = useState(defaultShow)
-    const [events, setEvents] = useState<any>()
+    // const [events, setEvents] = useState<any>()
+    const [events, setEvents] = useLocalStorage<any>("EventData")
+
     const [now, setNow] = useState(new Date())
 
 
     const handleEvents = (_events: EventApi[]) => {
-        setEvents(
-            _events
-        )
+        if (_events?.length > 0) {
+            setEvents(
+                _events
+            )
+        }
     }
 
     const DisplayUntilWhen = new Date(now.getTime() + SoonIsHours * 60 * 60 * 1000); // 6 hours in milliseconds
 
     const soon = events?.filter((event: EventApi) => {
-        return event.start && event.start >= now && event.start <= DisplayUntilWhen
+        // console.log("event", event.start)
+        if (!event.start) return false
+        const eventStart = new Date(event.start)
+        return eventStart >= now && eventStart <= DisplayUntilWhen
     }).sort(sortEvents)
 
     const hapeningNow = events?.filter((event: EventApi) => {
@@ -103,10 +113,10 @@ export default function Calendar({ }: {
                         soon?.map((event: EventApi) =>
                             <tr key={event.title}>
                                 <td>
-                                    {event?.start?.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true })}
+                                    {new Date(event?.start || 0).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true })}
                                 </td>
                                 <td >
-                                    {calcDescriptionOfTimeUntil(event?.start, now)}
+                                    {calcDescriptionOfTimeUntil(new Date(event?.start || 0), now)}
                                 </td>
                                 <td >
                                     {event.title}

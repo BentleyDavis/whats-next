@@ -82,7 +82,7 @@ export default function Calendar({ }: {
     }
 
 
-    return <div className="row mt-2 mb-2">
+    return <div className="row list-item ">
         <div className="col">
 
             {events?.length === 0 &&

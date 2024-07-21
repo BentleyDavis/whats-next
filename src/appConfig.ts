@@ -3,7 +3,7 @@ const location = document.location.toString();
 let appConfig = {
     appName: `What's Next`,
     appId: `whatsnext`,
-    version: `0.0.7`,
+    version: `0.0.8`,
     environment: 'prod',
 
     hourToStartNewDay: 4,

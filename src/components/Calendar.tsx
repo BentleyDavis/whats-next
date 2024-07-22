@@ -74,9 +74,10 @@ export default function Calendar({ }: {
         if (dif > (1000 * 60 * 60 * 2)) {
             result += `${Math.round(dif / 1000 / 60 / 60)} hours `
         } else {
-            result += `${Math.floor(dif / 1000 / 60 / 60)} hour `
+            if (dif > (1000 * 60 * 60 * 1)) {
+                result += `${Math.floor(dif / 1000 / 60 / 60)} hour `
+            }
             result += ` ${Math.floor(((dif) / 1000 / 60) % 60)} minutes `;
-            // result += ` ${Math.floor(((dif) / 1000) % 60)} seconds `
         }
         return result;
     }
@@ -98,7 +99,12 @@ export default function Calendar({ }: {
                     {
                         hapeningNow?.map((event: EventApi) =>
                             <tr key={event.title}>
+
                                 <td>
+                                    Hapening NOW! {event.title}
+                                </td>
+
+                                {/* <td>
                                     {event?.start?.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true })}
                                 </td>
                                 <td>
@@ -106,7 +112,8 @@ export default function Calendar({ }: {
                                 </td>
                                 <td >
                                     {event.title}
-                                </td>
+                                </td> */}
+
                             </tr>
                         )
                     }
@@ -114,7 +121,14 @@ export default function Calendar({ }: {
                     {
                         soon?.map((event: EventApi) =>
                             <tr key={event.title}>
+
                                 <td>
+                                    {calcDescriptionOfTimeUntil(new Date(event?.start || 0), now)}
+                                    <span style={{ fontSize: "medium" }}>( at {new Date(event?.start || 0).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true })} )</span>.
+                                    &nbsp;{event.title}
+                                </td>
+
+                                {/* <td>
                                     {new Date(event?.start || 0).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true })}
                                 </td>
                                 <td >
@@ -122,13 +136,16 @@ export default function Calendar({ }: {
                                 </td>
                                 <td >
                                     {event.title}
-                                </td>
+                                </td> */}
                             </tr>
                         )
                     }
                 </tbody>
 
             </table>
+
+
+
             {/* <Button variant="primary" onClick={() => { setShow(!show) }} >
                 {show ? "Hide" : "Show more"} calendar items
             </Button> */}

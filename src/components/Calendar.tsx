@@ -70,7 +70,7 @@ export default function Calendar({ }: {
     function calcDescriptionOfTimeUntil(when: Date | undefined | null, now: Date = new Date()) {
         if (!when) return ('')
         const dif = when.getTime() - now.getTime()
-        let result = 'in '
+        let result = ''
         if (dif > (1000 * 60 * 60 * 2)) {
             result += `${Math.round(dif / 1000 / 60 / 60)} hours `
         } else {
@@ -123,9 +123,9 @@ export default function Calendar({ }: {
                             <tr key={event.title}>
 
                                 <td>
-                                    {calcDescriptionOfTimeUntil(new Date(event?.start || 0), now)}
-                                    <span style={{ fontSize: "medium" }}>( at {new Date(event?.start || 0).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true })} )</span>.
-                                    &nbsp;{event.title}
+                                    Wait {calcDescriptionOfTimeUntil(new Date(event?.start || 0), now)}
+                                    <span style={{ fontSize: "medium" }}>( until {new Date(event?.start || 0).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true })} )</span>
+                                    : {event.title}
                                 </td>
 
                                 {/* <td>

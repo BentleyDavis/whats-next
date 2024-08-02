@@ -56,7 +56,8 @@ export default function Calendar({ }: {
     }).sort(sortEvents)
 
     const hapeningNow = events?.filter((event: EventApi) => {
-        return event.start && event.end && event.start <= now && event.end >= now;
+        if (!event.start || !event.end) return false
+        return new Date(event.start) <= now && new Date(event.end) >= now;
     }).sort(sortEvents);
 
     useEffect(() => {
@@ -95,7 +96,6 @@ export default function Calendar({ }: {
             }
             <table className='soon'>
                 <tbody>
-
                     {
                         hapeningNow?.map((event: EventApi) =>
                             <tr key={event.title}>

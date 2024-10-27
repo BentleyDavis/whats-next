@@ -17,3 +17,23 @@ export default function App() {
     </>
 
 }
+
+// Extend the Window interface to include goToRandomUrl
+declare global {
+    interface Window {
+        goToRandomUrl?: (urls: string[], event?: Event) => void;
+    }
+}
+
+// Check if goToRandomUrl is on the window object
+if (typeof window.goToRandomUrl !== 'function') {
+    // Function to navigate to a random URL from the array
+    window.goToRandomUrl = function (urls, event) {
+        if (event) {
+            event.preventDefault(); // Prevent the default link navigation if event is provided
+        }
+        const randomIndex = Math.floor(Math.random() * urls.length);
+        const selectedUrl = urls[randomIndex];
+        window.location.href = selectedUrl;
+    };
+}

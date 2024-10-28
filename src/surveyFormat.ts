@@ -21,8 +21,9 @@ export const surveyFormat: any = {
             "id": "tv",
             "content": `
                 <div class="list-item">
-                <h1>-  TV and Entertainment</h1>
-                <br>
+                <h1>-  TV and Entertainment</h1><br>
+
+                <p>
                 <a href="" onclick="
                     window.goToRandomUrl([
 '931c1642087957c4a7c38fa6973298f6',
@@ -168,6 +169,10 @@ export const surveyFormat: any = {
 'da56a5df1605ed1dca00c2a86460f5a8',
                     ],'https://therokuchannel.roku.com/watch/*', event);
                 ">Midsummer Murders</a>
+                </p>
+
+                <p><a href="https://www.netflix.com/browse/my-list">Netflix</a></p>
+
                 </div>
             `,
         },

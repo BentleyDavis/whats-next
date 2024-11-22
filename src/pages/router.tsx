@@ -3,6 +3,7 @@ import ErrorPage from "./Error";
 import App from "./App";
 import HomePage from "./Home";
 import WeatherPage from "./Weather";
+import TvPage from "./Tv";
 
 
 export const router = createBrowserRouter([
@@ -14,6 +15,10 @@ export const router = createBrowserRouter([
             {
                 path: "/weather",
                 element: <WeatherPage />,
+            },
+            {
+                path: "/tv",
+                element: <TvPage />,
             },
             {
                 path: "/",

@@ -31,7 +31,6 @@ const FullCalendarMemo = React.memo((props: any) => {
     // return prevProps.eventsSet === nextProps.eventsSet;
     if (lastcalCheck < new Date().getTime() - 1000 * 60 * 10) {
         lastcalCheck = new Date().getTime()
-        console.log("Cal check", lastcalCheck)
         return false
     }
     return true
@@ -54,8 +53,6 @@ export default function Calendar({ }: {
 
     const handleEvents = React.useRef((events: EventApi[]) => {
         if (events?.length > 0) {
-            console.log(now);
-            console.log("events", events);
             setEvents(events);
         }
     }).current;
@@ -65,7 +62,6 @@ export default function Calendar({ }: {
 
 
     const soon = events?.filter((event: EventApi) => {
-        // console.log("event", event.start)
         if (!event.start) return false
         const eventStart = new Date(event.start)
         return eventStart >= now && eventStart <= DisplayUntilWhen
@@ -114,8 +110,7 @@ export default function Calendar({ }: {
                 <tbody>
                     {
                         hapeningNow?.map((event: EventApi) =>
-                            <tr key={event.title}>
-
+                            <tr key={event.title + event.start}>
                                 <td>
                                     Hapening NOW! {event.title}
                                 </td>
@@ -136,8 +131,7 @@ export default function Calendar({ }: {
 
                     {
                         soon?.map((event: EventApi) =>
-                            <tr key={event.title}>
-
+                            <tr key={event.title + event.start}>
                                 <td>
                                     Wait {calcDescriptionOfTimeUntil(new Date(event?.start || 0), now)}
                                     <span style={{ fontSize: "medium" }}>( until {new Date(event?.start || 0).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true })} )</span>

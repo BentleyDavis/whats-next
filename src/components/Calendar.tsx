@@ -22,7 +22,9 @@ const sortEvents = (a: EventApi, b: EventApi) => {
 const FullCalendarMemo = React.memo((props: any) => {
     // Your FullCalendar configuration here
     return <FullCalendar {...props} />;
-}, (prevProps, nextProps) => {
+}, () => {
+
+    // }, (prevProps, nextProps) => {
     // Add a comparison function here to determine if re-render is necessary
     // Return true if props are equal (i.e., no re-render), false otherwise
     //return prevProps.events === nextProps.events && prevProps.config === nextProps.config;

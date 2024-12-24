@@ -11,6 +11,8 @@ import { useLocalStorage } from "@uidotdev/usehooks";
 
 const defaultShow = (new URLSearchParams(window.location.search)).get("cal") !== null ? true : false;
 const SoonIsHours = 8
+let lastcalCheck = new Date().getTime()
+let lastRefresh = new Date().getTime();
 
 const sortEvents = (a: EventApi, b: EventApi) => {
     if (!a.start || !b.start) return 0;
@@ -20,11 +22,17 @@ const sortEvents = (a: EventApi, b: EventApi) => {
 const FullCalendarMemo = React.memo((props: any) => {
     // Your FullCalendar configuration here
     return <FullCalendar {...props} />;
-}, () => {
+}, (prevProps, nextProps) => {
     // Add a comparison function here to determine if re-render is necessary
     // Return true if props are equal (i.e., no re-render), false otherwise
     //return prevProps.events === nextProps.events && prevProps.config === nextProps.config;
-    return true;
+    // return prevProps.eventsSet === nextProps.eventsSet;
+    if (lastcalCheck < new Date().getTime() - 1000 * 60 * 10) {
+        lastcalCheck = new Date().getTime()
+        console.log("Cal check", lastcalCheck)
+        return false
+    }
+    return true
 });
 
 
@@ -37,16 +45,22 @@ export default function Calendar({ }: {
 
     const [now, setNow] = useState(new Date())
 
-
-    const handleEvents = (_events: EventApi[]) => {
-        if (_events?.length > 0) {
-            setEvents(
-                _events
-            )
-        }
+    if (new Date().getTime() - lastRefresh > 1000 * 60 * 59) {
+        lastRefresh = new Date().getTime();
+        window.location.reload();
     }
 
+    const handleEvents = React.useRef((events: EventApi[]) => {
+        if (events?.length > 0) {
+            console.log(now);
+            console.log("events", events);
+            setEvents(events);
+        }
+    }).current;
+
     const DisplayUntilWhen = new Date(now.getTime() + SoonIsHours * 60 * 60 * 1000); // 6 hours in milliseconds
+
+
 
     const soon = events?.filter((event: EventApi) => {
         // console.log("event", event.start)

@@ -163,8 +163,7 @@ export default function TvPage() {
                 <p><a href="https://www.netflix.com/browse/my-list">Netflix</a></p>
 
                 <p><a href="" onClick={(event) => {
-                    // @ts-ignore
-                    window.goToRandomUrl([
+                    window.goToRandomUrl && window.goToRandomUrl([
                         "1", "2", "3", "4", "5", "6", "7", "8", "9", "10",
                         "11", "12", "13", "14", "15", "16", "17", "18", "19", "20",
                         "21", "22", "23", "24", "25", "26", "27", "28", "29", "30",
@@ -183,11 +182,28 @@ export default function TvPage() {
                         "151", "152", "153", "154", "155", "156", "157", "158", "159", "160",
                     ],
                         'https://www.youtube.com/watch?v=vo6D_tp3DeE&list=PLAEHAa_09VnZtbNIgY0SwrBNtHc3K8SeJ&index=*'
-                        // @ts-ignore
                         , event);
                 }}
                 >
                     Music
+                </a></p>
+
+                <p><a href="https://www.amazon.com/gp/video/detail/B0CBYD2BPM/ref=atv_dp_season_select_s1?jic=8%7CEgNhbGw%3D"    >
+                    Jesus (The Chosen)
+                </a></p>
+
+                <p><a href="" onClick={(event) => {
+                    window.goToRandomVideoTime && window.goToRandomVideoTime([
+                        {
+                            url: 'https://youtu.be/BHACKCNDMW8',
+                            maxMinutes: 150
+                        }
+                    ],
+                        event
+                    );
+                }}
+                >
+                    Relaxing Video
                 </a></p>
 
             </div>

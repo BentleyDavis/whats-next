@@ -21,7 +21,8 @@ export default function App() {
 // Extend the Window interface to include goToRandomUrl
 declare global {
     interface Window {
-        goToRandomUrl?: (urls: string[], template: string, event?: Event) => void;
+        goToRandomUrl?: (urls: string[], template: string, event?: any) => void;
+        goToRandomVideoTime?: (videos: { url: string, maxMinutes: number }[], event?: any) => void;
     }
 }
 
@@ -36,5 +37,19 @@ if (typeof window.goToRandomUrl !== 'function') {
         const selectedUrl = urls[randomIndex];
         console.log(urls, selectedUrl)
         window.location.href = template.replace("*", selectedUrl);
+    };
+}
+
+if (typeof window.goToRandomVideoTime !== 'function') {
+    window.goToRandomVideoTime = function (videos, event) {
+        if (event) {
+            event.preventDefault();
+        }
+        const randomIndex = Math.floor(Math.random() * videos.length);
+        const selectedVideo = videos[randomIndex];
+        const maxSeconds = selectedVideo.maxMinutes * 60; // Convert minutes to seconds
+        const totalSeconds = Math.floor(Math.random() * (maxSeconds));
+        const separator = selectedVideo.url.includes('?') ? '&' : '?';
+        window.location.href = `${selectedVideo.url}${separator}t=${totalSeconds}`;
     };
 }

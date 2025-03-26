@@ -193,6 +193,21 @@ export default function TvPage() {
                 </a></p>
 
                 <p><a href="" onClick={(event) => {
+                    window.goToRandomUrl && window.goToRandomUrl([
+                        "0s",
+                        "5997s",
+                        "11967s",
+                        "17761s",
+                        "23500s",
+                    ],
+                        'https://www.youtube.com/live/8n8SjAV2pGo?t=*'
+                        , event);
+                }}
+                >
+                    Doctor Who
+                </a></p>
+
+                <p><a href="" onClick={(event) => {
                     window.goToRandomVideoTime && window.goToRandomVideoTime([
                         {
                             url: 'https://youtu.be/BHACKCNDMW8',

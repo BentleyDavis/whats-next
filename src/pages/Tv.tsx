@@ -188,38 +188,37 @@ export default function TvPage() {
                     Music
                 </a></p>
 
-                <p><a href="https://www.amazon.com/gp/video/detail/B0CBYD2BPM/ref=atv_dp_season_select_s1?jic=8%7CEgNhbGw%3D"    >
-                    Jesus (The Chosen)
-                </a></p>
+                <p>
+                    <a
+                        href="https://www.amazon.com/gp/video/detail/B0CBYD2BPM/ref=atv_dp_season_select_s1?jic=8%7CEgNhbGw%3D"
+                    >
+                        Jesus (The Chosen)
+                    </a>
+                </p>
 
-                <p><a href="" onClick={(event) => {
-                    window.goToRandomUrl && window.goToRandomUrl([
-                        "0s",
-                        "5997s",
-                        "11967s",
-                        "17761s",
-                        "23500s",
-                    ],
-                        'https://www.youtube.com/live/8n8SjAV2pGo?t=*'
-                        , event);
-                }}
-                >
-                    Doctor Who
-                </a></p>
+                <p>
+                    <a
+                        href="https://www.amazon.com/Classic-Doctor-Who/dp/B074FHZR2T"
+                    >
+                        Doctor Who
+                    </a>
+                </p>
 
-                <p><a href="" onClick={(event) => {
-                    window.goToRandomVideoTime && window.goToRandomVideoTime([
-                        {
-                            url: 'https://youtu.be/BHACKCNDMW8',
-                            maxMinutes: 150
-                        }
-                    ],
-                        event
-                    );
-                }}
-                >
-                    Relaxing Video
-                </a></p>
+                <p>
+                    <a href="" onClick={(event) => {
+                        window.goToRandomVideoTime && window.goToRandomVideoTime([
+                            {
+                                url: 'https://youtu.be/BHACKCNDMW8',
+                                maxMinutes: 150
+                            }
+                        ],
+                            event
+                        );
+                    }}
+                    >
+                        Relaxing Video
+                    </a>
+                </p>
 
             </div>
         </div>

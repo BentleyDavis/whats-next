@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 
 export default function TvPage() {
     useEffect(() => {
-        fetch("http://localhost:3000/list-videos")
+        fetch("http://localhost:3537/list-videos")
             .then(res => res.json())
             .then(files => {
                 console.log("Local video list:", files);

@@ -1,6 +1,16 @@
-
+import { useEffect } from 'react';
 
 export default function TvPage() {
+    useEffect(() => {
+        fetch("http://localhost:3000/list-videos")
+            .then(res => res.json())
+            .then(files => {
+                console.log("Local video list:", files);
+            })
+            .catch(error => {
+                console.error("Error fetching local video list:", error);
+            });
+    }, []);
 
     return (
         <div className="container">
@@ -219,6 +229,10 @@ export default function TvPage() {
                         Relaxing Video
                     </a>
                 </p>
+
+            </div>
+
+            <div style={{ opacity: 0.1 }}>
 
             </div>
         </div>

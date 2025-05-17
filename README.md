@@ -1,3 +1,9 @@
+# Quick Reference
+
+- https://app.netlify.com/projects/whats-up-next/deploys
+
+---------------------
+
 - old firebase  -   "firebase": "^10.12.2",
 
 

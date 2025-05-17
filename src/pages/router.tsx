@@ -4,6 +4,7 @@ import App from "./App";
 import HomePage from "./Home";
 import WeatherPage from "./Weather";
 import TvPage from "./Tv";
+import Tv2Page from "./Tv2";
 
 
 export const router = createBrowserRouter([
@@ -19,6 +20,10 @@ export const router = createBrowserRouter([
             {
                 path: "/tv",
                 element: <TvPage />,
+            },
+            {
+                path: "/tv2",
+                element: <Tv2Page />,
             },
             {
                 path: "/",

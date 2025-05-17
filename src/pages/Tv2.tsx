@@ -1,0 +1,375 @@
+import { useEffect, useState, useRef } from 'react';
+import ReactPlayer from 'react-player';
+import './Tv2.css'; // Import CSS file for styles
+
+// Server configuration
+const VIDEO_SERVER_URL = "http://localhost:3537";
+
+export default function Tv2Page() {
+    const [localVideos, setLocalVideos] = useState<string[]>([]);
+    const [currentVideo, setCurrentVideo] = useState<string | null>(null);
+    const [playerError, setPlayerError] = useState<string | null>(null);
+    const [isPlaying, setIsPlaying] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [autoplayBlocked, setAutoplayBlocked] = useState(false);
+    const [progress, setProgress] = useState(0);
+    const [duration, setDuration] = useState(0);
+    const playerRef = useRef<ReactPlayer>(null);
+
+    useEffect(() => {
+        // Dummy data to use if fetch fails
+        const dummyVideos = [
+            "C:/Videos/nature_documentary.mp4",
+            "C:/Videos/vacation_2024.mp4",
+            "C:/Videos/family_gathering.mp4",
+            "C:/Videos/tutorial_react.mp4",
+            "C:/Videos/concert_recording.mp4"
+        ];
+
+        fetch(`${VIDEO_SERVER_URL}/list-videos`)
+            .then(res => res.json())
+            .then(files => {
+                setLocalVideos(files);
+
+                // Load a random video at startup
+                if (files.length > 0) {
+                    const randomIndex = Math.floor(Math.random() * files.length);
+                    handleVideoSelect(files[randomIndex], true);
+                }
+            })
+            .catch(_error => {
+                // Use dummy data if fetch fails
+                setLocalVideos(dummyVideos);
+
+                // Load a random dummy video
+                if (dummyVideos.length > 0) {
+                    const randomIndex = Math.floor(Math.random() * dummyVideos.length);
+                    handleVideoSelect(dummyVideos[randomIndex], true);
+                }
+            });
+    }, []);
+
+    const handleVideoSelect = (videoPath: string, autoPlay: boolean = false) => {
+        // Reset states
+        setPlayerError(null); // Reset any previous errors
+        setIsPlaying(autoPlay); // Start playing only if autoPlay is true
+        setIsLoading(true); // Set loading state to true when selecting a new video
+        setAutoplayBlocked(false); // Clear autoplay blocked state when selecting a new video
+
+        // Check if the path already has the server URL
+        if (videoPath.startsWith('http://')) {
+            setCurrentVideo(videoPath);
+        } else {
+            // Add the server URL prefix to the video path
+            // Make sure to avoid double slashes by removing any leading slash from videoPath
+            const cleanPath = videoPath.startsWith('/') ? videoPath.substring(1) : videoPath;
+            const fullVideoUrl = `${VIDEO_SERVER_URL}/${cleanPath}`;
+            setCurrentVideo(fullVideoUrl);
+        }
+    };
+
+    const handleLoadRandomVideo = () => {
+        if (localVideos.length === 0) return;
+
+        // If we only have one video, there's nothing to change to
+        if (localVideos.length === 1) {
+            handleVideoSelect(localVideos[0], true);
+            return;
+        }
+
+        // Get the current video path without the server URL prefix
+        let currentVideoPath = null;
+        if (currentVideo) {
+            currentVideoPath = currentVideo.replace(VIDEO_SERVER_URL + '/', '');
+        }
+
+        // Get all videos except the current one
+        const availableVideos = localVideos.filter(video => {
+            const cleanPath = video.startsWith('/') ? video.substring(1) : video;
+            return cleanPath !== currentVideoPath;
+        });
+
+        if (availableVideos.length === 0) return;
+
+        // Select a random video from the available videos
+        const randomIndex = Math.floor(Math.random() * availableVideos.length);
+        const randomVideo = availableVideos[randomIndex];
+        handleVideoSelect(randomVideo, true); // Auto-play when loading a random video
+    };
+
+    const handlePlayerError = (error: any) => {
+        setIsLoading(false); // Stop loading state on error
+
+        // Check if the error is related to autoplay restrictions
+        const errorMessage = error?.message || '';
+        const isAutoplayError = errorMessage.includes("play() failed because the user didn't interact");
+
+        if (isAutoplayError) {
+            // This is an autoplay restriction, not a true error
+            setAutoplayBlocked(true);
+            setPlayerError(null); // Clear any previous error
+        } else {
+            // This is a genuine error
+            setAutoplayBlocked(false);
+
+            // Get detailed error information for genuine errors
+            let detailedError = "Failed to play video from server.";
+            if (error?.target?.error?.code) {
+                // Handle media error codes
+                const errorCode = error.target.error.code;
+                switch (errorCode) {
+                    case 1:
+                        detailedError += " The video was aborted.";
+                        break;
+                    case 2:
+                        detailedError += " Network error occurred.";
+                        break;
+                    case 3:
+                        detailedError += " Problem decoding the video.";
+                        break;
+                    case 4:
+                        detailedError += " Video not found or access denied.";
+                        break;
+                    default:
+                        detailedError += ` Error code: ${errorCode}`;
+                }
+            } else if (error?.message) {
+                detailedError += ` ${error.message}`;
+            }
+
+            setPlayerError(detailedError);
+        }
+    };
+
+    const handlePlayerReady = () => {
+        // Keep loading state for a moment after video is ready
+        setTimeout(() => {
+            setIsLoading(false);
+
+            // Less aggressive check for autoplay blocking
+            if (isPlaying && playerRef.current) {
+                const internalPlayer = playerRef.current.getInternalPlayer();
+                // Only check if paused, don't use current time as it can be unreliable
+                const isVideoActuallyPlaying = internalPlayer &&
+                    (internalPlayer.paused === false);
+
+                // Only set autoplay blocked if we're very sure it's blocked
+                if (!isVideoActuallyPlaying && !autoplayBlocked && isPlaying) {
+                    setAutoplayBlocked(true);
+                }
+            }
+        }, 1500);
+    };
+
+    const handleTogglePlayPause = () => {
+        // If autoplay was blocked, clear that state when user interacts
+        if (autoplayBlocked) {
+            setAutoplayBlocked(false);
+        }
+
+        // Toggle the playing state
+        const newPlayingState = !isPlaying;
+        setIsPlaying(newPlayingState);
+
+        // If we're trying to play and we have the player reference, 
+        // use the native play method for more reliable playback
+        if (newPlayingState && playerRef.current) {
+            const internalPlayer = playerRef.current.getInternalPlayer();
+            if (internalPlayer && typeof internalPlayer.play === 'function') {
+                internalPlayer.play().catch((_error: Error) => {
+                    // If play fails, reset the playing state to match reality
+                    setIsPlaying(false);
+                });
+            }
+        } else if (!newPlayingState && playerRef.current) {
+            // If we're pausing, make sure to call the native pause method
+            const internalPlayer = playerRef.current.getInternalPlayer();
+            if (internalPlayer && typeof internalPlayer.pause === 'function') {
+                internalPlayer.pause();
+            }
+        }
+    };
+
+    const handleStartVideo = () => {
+        // Clear autoplay blocked state immediately
+        setAutoplayBlocked(false);
+        setIsPlaying(true);
+
+        // Directly access the video element and play it
+        // This is necessary because the browser requires a direct user gesture
+        if (playerRef.current) {
+            try {
+                // Try getting the internal player
+                const internalPlayer = playerRef.current.getInternalPlayer();
+
+                if (internalPlayer) {
+                    // Force play with multiple approaches
+                    if (typeof internalPlayer.play === 'function') {
+                        // For HTML5 video elements - try playing immediately
+                        internalPlayer.muted = false; // Ensure it's not muted
+
+                        // Try playing with a small delay to ensure DOM is ready
+                        setTimeout(() => {
+                            try {
+                                const playPromise = internalPlayer.play();
+                                if (playPromise !== undefined) {
+                                    playPromise.catch((_error: Error) => {
+                                        // Handle play error silently
+                                    });
+                                }
+                            } catch (_err) {
+                                // Handle exception silently
+                            }
+                        }, 50);
+                    }
+                }
+            } catch (_e) {
+                // Handle access error silently
+            }
+        }
+    };
+
+    const handleProgress = (state: { played: number; playedSeconds: number; loaded: number; loadedSeconds: number }) => {
+        // Update progress without re-rendering too often
+        setProgress(state.playedSeconds);
+    };
+
+    const handleDuration = (duration: number) => {
+        setDuration(duration);
+    };
+
+    const handleSeekChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const time = parseFloat(e.target.value);
+        setProgress(time);
+    };
+
+    const handleSeekMouseUp = (e: React.MouseEvent<HTMLInputElement>) => {
+        const time = parseFloat((e.target as HTMLInputElement).value);
+        playerRef.current?.seekTo(time);
+    };
+
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.code === 'Space') {
+                e.preventDefault();
+                handleTogglePlayPause();
+            }
+        };
+
+        document.addEventListener('keydown', handleKeyDown);
+        return () => document.removeEventListener('keydown', handleKeyDown);
+    }, [isPlaying]);
+
+    return (
+        <div className="tv-container">
+            <div className="video-display">
+                {currentVideo ? (
+                    <div className="player-wrapper" onClick={handleTogglePlayPause}>                        <ReactPlayer
+                        ref={playerRef}
+                        className="react-player"
+                        url={currentVideo} width="100%"
+                        height="100%"
+                        controls={false}
+                        playing={isPlaying}
+                        onError={handlePlayerError}
+                        onProgress={(state) => {
+                            handleProgress(state);
+                            // Update isPlaying based on player's actual state if we can detect it
+                            if (playerRef.current) {
+                                const player = playerRef.current.getInternalPlayer();
+                                if (player && player.paused !== undefined) {
+                                    if (isPlaying !== !player.paused) {
+                                        setIsPlaying(!player.paused);
+                                    }
+                                }
+                            }
+                        }}
+                        onDuration={handleDuration}
+                        onReady={handlePlayerReady}
+                        onPlay={() => setIsPlaying(true)}
+                        onPause={() => setIsPlaying(false)}
+                        config={{
+                            file: {
+                                forceVideo: true,
+                                attributes: {
+                                    crossOrigin: "anonymous"
+                                },
+                                hlsOptions: {
+                                    enableWorker: true,
+                                    xhrSetup: function (xhr: XMLHttpRequest) {
+                                        xhr.withCredentials = false;
+                                    }
+                                }
+                            }
+                        }}
+                    />                        {isLoading && (
+                        <div className="loading-overlay">
+                            <div className="spinner"></div>
+                            <p>Loading Video...</p>
+                        </div>
+                    )}                        {!playerError && autoplayBlocked && (
+                        <div className="start-video-overlay" onClick={handleStartVideo}>
+                            <button className="start-video-btn" onClick={(e) => {
+                                e.stopPropagation(); // Prevent double triggering
+                                handleStartVideo();
+                            }}>
+                                Start Video
+                            </button>
+                        </div>
+                    )}
+                        {playerError && (
+                            <div className="player-error">
+                                <p>{playerError}</p>
+                                <p className="small">Please select another video</p>
+                            </div>
+                        )}
+                    </div>
+                ) : (
+                    <div className="no-video-message">
+                        <h2>Select a video to play</h2>
+                    </div>
+                )}
+            </div>
+            <div className="video-controls">
+                <div className="playback-controls">
+                    {currentVideo && (
+                        <>
+                            <input
+                                type="range"
+                                min="0"
+                                max={duration}
+                                step="0.1"
+                                value={progress}
+                                onChange={handleSeekChange}
+                                onMouseUp={handleSeekMouseUp}
+                                className="seek-bar"
+                            />
+                        </>
+                    )}                    <div className="control-buttons">                        {currentVideo && (<button
+                        onClick={handleTogglePlayPause}
+                        className={`play-pause-btn ${isPlaying ? 'playing' : 'paused'}`}
+                        aria-label={isPlaying ? "Pause video" : "Play video"}
+                    >
+                        {isPlaying ? "Pause" : "Play"}
+                    </button>
+                    )}
+                        <button onClick={handleLoadRandomVideo}>Play Something Else</button>
+                    </div>
+                </div>
+                <div className="video-list">
+                    <ul>
+                        {localVideos.map((video, index) => (
+                            <li
+                                key={index}
+                                onClick={() => handleVideoSelect(video, true)}
+                                className={currentVideo?.includes(video.split('/').pop() || '') ? 'active' : ''}
+                            >
+                                {video.split('/').pop() || video.split('\\').pop()} {/* Display just the filename */}
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    );
+}

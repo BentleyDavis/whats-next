@@ -1,0 +1,104 @@
+/* NotificationButtons.css */
+.notification-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    padding: 0 10px;
+    border-left: 1px solid #444;
+    margin-left: 15px;
+    min-height: 42px;
+    /* Ensure consistent height */
+}
+
+.notification-buttons button {
+    background-color: #d32f2f;
+    color: white;
+    min-width: 80px;
+    cursor: pointer;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 1rem;
+    border: 1px solid #b71c1c;
+    transition: background-color 0.2s, transform 0.1s;
+    font-weight: bold;
+}
+
+.notification-buttons button:hover {
+    background-color: #b71c1c;
+}
+
+.notification-buttons button:active {
+    transform: scale(0.97);
+    background-color: #7f0000;
+}
+
+/* Status styles */
+.notification-status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 15px;
+    border-radius: 8px;
+    min-width: 260px;
+    position: relative;
+    /* For positioning the close button */
+}
+
+.notification-status p {
+    margin: 0;
+    font-size: 1rem;
+}
+
+/* Close button styles */
+.notification-status .close-button {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    min-width: auto;
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    line-height: 1;
+    border-radius: 50%;
+    background-color: rgba(0, 0, 0, 0.2);
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.notification-status .close-button:hover {
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.notification-status .close-button:active {
+    background-color: rgba(0, 0, 0, 0.6);
+}
+
+.notification-status.loading {
+    background-color: #f5f5f5;
+    color: #333;
+    display: flex;
+    gap: 10px;
+}
+
+.notification-status.success {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+}
+
+.notification-status.error {
+    background-color: #ffebee;
+    color: #c62828;
+}
+
+/* Use the existing spinner but with some adjustments */
+.notification-status .spinner {
+    height: 1.2em;
+    width: 1.2em;
+    margin: 0 5px 0 0;
+}

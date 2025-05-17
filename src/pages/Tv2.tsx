@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import ReactPlayer from 'react-player';
 import './Tv2.css'; // Import CSS file for styles
+import NotificationButtons from '../components/NotificationButtons';
 
 // Server configuration
 const VIDEO_SERVER_URL = "http://localhost:3537";
@@ -109,11 +110,11 @@ export default function Tv2Page() {
         // Check if the path already has the server URL
         if (videoPath.startsWith('http://')) {
             setCurrentVideo(videoPath);
-        } else {
-            // Add the server URL prefix to the video path
+        } else {            // Add the server URL prefix to the video path
             // Make sure to avoid double slashes by removing any leading slash from videoPath
             const cleanPath = videoPath.startsWith('/') ? videoPath.substring(1) : videoPath;
-            const fullVideoUrl = `${VIDEO_SERVER_URL}/${cleanPath}`; setCurrentVideo(fullVideoUrl);
+            const fullVideoUrl = `${VIDEO_SERVER_URL}/${cleanPath}`;
+            setCurrentVideo(fullVideoUrl);
         }
 
         // If autoPlay is requested, we'll try to play after the video loads in onPlayerReady
@@ -186,11 +187,11 @@ export default function Tv2Page() {
                 }
             } else if (error?.message) {
                 detailedError += ` ${error.message}`;
-            }
-
-            setPlayerError(detailedError);
+            } setPlayerError(detailedError);
         }
-    }; const onPlayerReady = () => {
+    };
+
+    const onPlayerReady = () => {
         // Keep loading state for a moment after video is ready
         setTimeout(() => {
             setIsLoading(false);
@@ -237,7 +238,9 @@ export default function Tv2Page() {
         } else {
             stopPlaying();
         }
-    }; const handleStartVideo = () => {
+    };
+
+    const handleStartVideo = () => {
         // Clear autoplay blocked state immediately
         setAutoplayBlocked(false);
         setIsPlaying(true);
@@ -274,13 +277,13 @@ export default function Tv2Page() {
                 {currentVideo ? (
                     <div className="player-wrapper" onClick={handleTogglePlayPause}>
                         <ReactPlayer
-                            ref={playerRef}
-                            className="react-player"
+                            ref={playerRef} className="react-player"
                             url={currentVideo}
                             width="100%"
                             height="100%"
                             controls={false}
-                            onError={onPlayerError} onProgress={(state) => {
+                            onError={onPlayerError}
+                            onProgress={(state) => {
                                 // Update progress without re-rendering too often
                                 setProgress(state.playedSeconds);
                                 // Update isPlaying based on player's actual state if we can detect it
@@ -354,9 +357,8 @@ export default function Tv2Page() {
                                 onChange={handleSeekChange}
                                 onMouseUp={handleSeekMouseUp}
                                 className="seek-bar"
-                            />
-                        </>
-                    )}
+                            />                        </>)}
+
                     <div className="control-buttons">
                         {currentVideo && (<button
                             onClick={handleTogglePlayPause}
@@ -364,25 +366,14 @@ export default function Tv2Page() {
                             aria-label={isPlaying ? "Pause video" : "Play video"}
                         >
                             {isPlaying ? "Pause" : "Play"}
-                        </button>
-                        )}
+                        </button>)}
+
                         <button onClick={handleLoadRandomVideo}>Play Something Else</button>
+
+                        <NotificationButtons />
                     </div>
                 </div>
-                <div className="video-list">
-                    <ul>
-                        {localVideos.map((video, index) => (
-                            <li
-                                key={index}
-                                onClick={() => handleVideoSelect(video, true)}
-                                className={currentVideo?.includes(video.split('/').pop() || '') ? 'active' : ''}
-                            >
-                                {video.split('/').pop() || video.split('\\').pop()} {/* Display just the filename */}
-                            </li>
-                        ))}
-                    </ul>
-                </div>
             </div>
-        </div>
+        </div >
     );
 }

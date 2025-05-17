@@ -222,13 +222,13 @@ export default function TvPage() {
                     </a>
                 </p>
 
-                <p>
+                {/* <p>
                     <a
                         href="https://www.amazon.com/Classic-Doctor-Who/dp/B074FHZR2T"
                     >
                         Doctor Who
                     </a>
-                </p>
+                </p> */}
 
                 <p>
                     <a href="" onClick={(event) => {

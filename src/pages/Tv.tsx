@@ -1,32 +1,5 @@
-import { useEffect, useState } from 'react';
 
 export default function TvPage() {
-    const [localVideos, setLocalVideos] = useState<string[]>([]);
-
-    useEffect(() => {
-        console.log("Fetching local video list...");
-
-        // Dummy data to use if fetch fails
-        const dummyVideos = [
-            "C:/Videos/nature_documentary.mp4",
-            "C:/Videos/vacation_2024.mp4",
-            "C:/Videos/family_gathering.mp4",
-            "C:/Videos/tutorial_react.mp4",
-            "C:/Videos/concert_recording.mp4"
-        ];
-
-        fetch("http://localhost:3537/list-videos")
-            .then(res => res.json())
-            .then(files => {
-                console.log("Local video list:", files);
-                setLocalVideos(files);
-            })
-            .catch(error => {
-                console.error("Error fetching local video list:", error);
-                // Use dummy data if fetch fails
-                setLocalVideos(dummyVideos);
-            });
-    }, []);
 
     return (
         <div className="container">
@@ -246,13 +219,8 @@ export default function TvPage() {
                     </a>
                 </p>
 
-            </div>            <div style={{ opacity: 0.1 }}>
-                <ul>
-                    {localVideos.map((video, index) => (
-                        <li key={index}>{video}</li>
-                    ))}
-                </ul>
             </div>
+
         </div>
     );
 }

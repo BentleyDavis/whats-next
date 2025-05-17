@@ -16,6 +16,55 @@ export default function Tv2Page() {
     const [duration, setDuration] = useState(0);
     const playerRef = useRef<ReactPlayer>(null);
 
+    // New function to start playing using playerRef
+    const startPlaying = () => {
+        if (!playerRef.current) return;
+
+        try {
+            const internalPlayer = playerRef.current.getInternalPlayer();
+            if (internalPlayer && typeof internalPlayer.play === 'function') {
+                internalPlayer.muted = false; // Ensure it's not muted
+
+                // Try playing with a small delay to ensure DOM is ready
+                setTimeout(() => {
+                    try {
+                        const playPromise = internalPlayer.play();
+                        if (playPromise !== undefined) {
+                            playPromise.catch((_error: Error) => {
+                                // If play fails, reset the playing state
+                                setIsPlaying(false);
+                                // Check if it's an autoplay restriction
+                                if (_error.message?.includes("play() failed because the user didn't interact")) {
+                                    setAutoplayBlocked(true);
+                                }
+                            });
+                        }
+                    } catch (_err) {
+                        console.error("Error playing video:", _err);
+                        setIsPlaying(false);
+                    }
+                }, 50);
+            }
+        } catch (_e) {
+            // Handle access error silently
+            setIsPlaying(false);
+        }
+    };
+
+    // New function to stop playing using playerRef
+    const stopPlaying = () => {
+        if (!playerRef.current) return;
+
+        try {
+            const internalPlayer = playerRef.current.getInternalPlayer();
+            if (internalPlayer && typeof internalPlayer.pause === 'function') {
+                internalPlayer.pause();
+            }
+        } catch (_e) {
+            // Handle access error silently
+        }
+    };
+
     useEffect(() => {
         // Dummy data to use if fetch fails
         const dummyVideos = [
@@ -52,10 +101,11 @@ export default function Tv2Page() {
     const handleVideoSelect = (videoPath: string, autoPlay: boolean = false) => {
         // Reset states
         setPlayerError(null); // Reset any previous errors
-        setIsPlaying(autoPlay); // Start playing only if autoPlay is true
+        setIsPlaying(autoPlay); // Update UI state
         setIsLoading(true); // Set loading state to true when selecting a new video
         setAutoplayBlocked(false); // Clear autoplay blocked state when selecting a new video
 
+        playerRef.current?.seekTo(100);
         // Check if the path already has the server URL
         if (videoPath.startsWith('http://')) {
             setCurrentVideo(videoPath);
@@ -63,9 +113,10 @@ export default function Tv2Page() {
             // Add the server URL prefix to the video path
             // Make sure to avoid double slashes by removing any leading slash from videoPath
             const cleanPath = videoPath.startsWith('/') ? videoPath.substring(1) : videoPath;
-            const fullVideoUrl = `${VIDEO_SERVER_URL}/${cleanPath}`;
-            setCurrentVideo(fullVideoUrl);
+            const fullVideoUrl = `${VIDEO_SERVER_URL}/${cleanPath}`; setCurrentVideo(fullVideoUrl);
         }
+
+        // If autoPlay is requested, we'll try to play after the video loads in onPlayerReady
     };
 
     const handleLoadRandomVideo = () => {
@@ -97,7 +148,7 @@ export default function Tv2Page() {
         handleVideoSelect(randomVideo, true); // Auto-play when loading a random video
     };
 
-    const handlePlayerError = (error: any) => {
+    const onPlayerError = (error: any) => {
         setIsLoading(false); // Stop loading state on error
 
         // Check if the error is related to autoplay restrictions
@@ -139,26 +190,35 @@ export default function Tv2Page() {
 
             setPlayerError(detailedError);
         }
-    };
-
-    const handlePlayerReady = () => {
+    }; const onPlayerReady = () => {
         // Keep loading state for a moment after video is ready
         setTimeout(() => {
             setIsLoading(false);
 
-            // Less aggressive check for autoplay blocking
-            if (isPlaying && playerRef.current) {
-                const internalPlayer = playerRef.current.getInternalPlayer();
-                // Only check if paused, don't use current time as it can be unreliable
-                const isVideoActuallyPlaying = internalPlayer &&
-                    (internalPlayer.paused === false);
+            // If autoplay was requested (isPlaying is true), try to start playing
+            if (isPlaying) {
+                startPlaying();
 
-                // Only set autoplay blocked if we're very sure it's blocked
-                if (!isVideoActuallyPlaying && !autoplayBlocked && isPlaying) {
-                    setAutoplayBlocked(true);
-                }
+                // Check if play actually worked after a short delay
+                setTimeout(() => {
+                    if (playerRef.current) {
+                        const internalPlayer = playerRef.current.getInternalPlayer();
+                        // Only check if paused, don't use current time as it can be unreliable
+                        const isVideoActuallyPlaying = internalPlayer &&
+                            (internalPlayer.paused === false);
+
+                        // Only set autoplay blocked if we're very sure it's blocked
+                        if (!isVideoActuallyPlaying && !autoplayBlocked && isPlaying) {
+                            setAutoplayBlocked(true);
+                        }
+                    }
+                }, 500);
             }
         }, 1500);
+    };
+
+    const onPlayerDuration = (duration: number) => {
+        setDuration(duration);
     };
 
     const handleTogglePlayPause = () => {
@@ -171,71 +231,19 @@ export default function Tv2Page() {
         const newPlayingState = !isPlaying;
         setIsPlaying(newPlayingState);
 
-        // If we're trying to play and we have the player reference, 
-        // use the native play method for more reliable playback
-        if (newPlayingState && playerRef.current) {
-            const internalPlayer = playerRef.current.getInternalPlayer();
-            if (internalPlayer && typeof internalPlayer.play === 'function') {
-                internalPlayer.play().catch((_error: Error) => {
-                    // If play fails, reset the playing state to match reality
-                    setIsPlaying(false);
-                });
-            }
-        } else if (!newPlayingState && playerRef.current) {
-            // If we're pausing, make sure to call the native pause method
-            const internalPlayer = playerRef.current.getInternalPlayer();
-            if (internalPlayer && typeof internalPlayer.pause === 'function') {
-                internalPlayer.pause();
-            }
+        // Use the direct methods to control playback
+        if (newPlayingState) {
+            startPlaying();
+        } else {
+            stopPlaying();
         }
-    };
-
-    const handleStartVideo = () => {
+    }; const handleStartVideo = () => {
         // Clear autoplay blocked state immediately
         setAutoplayBlocked(false);
         setIsPlaying(true);
 
-        // Directly access the video element and play it
-        // This is necessary because the browser requires a direct user gesture
-        if (playerRef.current) {
-            try {
-                // Try getting the internal player
-                const internalPlayer = playerRef.current.getInternalPlayer();
-
-                if (internalPlayer) {
-                    // Force play with multiple approaches
-                    if (typeof internalPlayer.play === 'function') {
-                        // For HTML5 video elements - try playing immediately
-                        internalPlayer.muted = false; // Ensure it's not muted
-
-                        // Try playing with a small delay to ensure DOM is ready
-                        setTimeout(() => {
-                            try {
-                                const playPromise = internalPlayer.play();
-                                if (playPromise !== undefined) {
-                                    playPromise.catch((_error: Error) => {
-                                        // Handle play error silently
-                                    });
-                                }
-                            } catch (_err) {
-                                // Handle exception silently
-                            }
-                        }, 50);
-                    }
-                }
-            } catch (_e) {
-                // Handle access error silently
-            }
-        }
-    };
-
-    const handleProgress = (state: { played: number; playedSeconds: number; loaded: number; loadedSeconds: number }) => {
-        // Update progress without re-rendering too often
-        setProgress(state.playedSeconds);
-    };
-
-    const handleDuration = (duration: number) => {
-        setDuration(duration);
+        // Use the new startPlaying function
+        startPlaying();
     };
 
     const handleSeekChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -264,59 +272,62 @@ export default function Tv2Page() {
         <div className="tv-container">
             <div className="video-display">
                 {currentVideo ? (
-                    <div className="player-wrapper" onClick={handleTogglePlayPause}>                        <ReactPlayer
-                        ref={playerRef}
-                        className="react-player"
-                        url={currentVideo} width="100%"
-                        height="100%"
-                        controls={false}
-                        playing={isPlaying}
-                        onError={handlePlayerError}
-                        onProgress={(state) => {
-                            handleProgress(state);
-                            // Update isPlaying based on player's actual state if we can detect it
-                            if (playerRef.current) {
-                                const player = playerRef.current.getInternalPlayer();
-                                if (player && player.paused !== undefined) {
-                                    if (isPlaying !== !player.paused) {
-                                        setIsPlaying(!player.paused);
+                    <div className="player-wrapper" onClick={handleTogglePlayPause}>
+                        <ReactPlayer
+                            ref={playerRef}
+                            className="react-player"
+                            url={currentVideo}
+                            width="100%"
+                            height="100%"
+                            controls={false}
+                            onError={onPlayerError} onProgress={(state) => {
+                                // Update progress without re-rendering too often
+                                setProgress(state.playedSeconds);
+                                // Update isPlaying based on player's actual state if we can detect it
+                                if (playerRef.current) {
+                                    const player = playerRef.current.getInternalPlayer();
+                                    if (player && player.paused !== undefined) {
+                                        if (isPlaying !== !player.paused) {
+                                            setIsPlaying(!player.paused);
+                                        }
                                     }
                                 }
-                            }
-                        }}
-                        onDuration={handleDuration}
-                        onReady={handlePlayerReady}
-                        onPlay={() => setIsPlaying(true)}
-                        onPause={() => setIsPlaying(false)}
-                        config={{
-                            file: {
-                                forceVideo: true,
-                                attributes: {
-                                    crossOrigin: "anonymous"
-                                },
-                                hlsOptions: {
-                                    enableWorker: true,
-                                    xhrSetup: function (xhr: XMLHttpRequest) {
-                                        xhr.withCredentials = false;
+                            }}
+                            onDuration={onPlayerDuration}
+                            onReady={onPlayerReady}
+                            onPlay={() => setIsPlaying(true)}
+                            onPause={() => setIsPlaying(false)}
+                            config={{
+                                file: {
+                                    forceVideo: true,
+                                    attributes: {
+                                        crossOrigin: "anonymous"
+                                    },
+                                    hlsOptions: {
+                                        enableWorker: true,
+                                        xhrSetup: function (xhr: XMLHttpRequest) {
+                                            xhr.withCredentials = false;
+                                        }
                                     }
                                 }
-                            }
-                        }}
-                    />                        {isLoading && (
-                        <div className="loading-overlay">
-                            <div className="spinner"></div>
-                            <p>Loading Video...</p>
-                        </div>
-                    )}                        {!playerError && autoplayBlocked && (
-                        <div className="start-video-overlay" onClick={handleStartVideo}>
-                            <button className="start-video-btn" onClick={(e) => {
-                                e.stopPropagation(); // Prevent double triggering
-                                handleStartVideo();
-                            }}>
-                                Start Video
-                            </button>
-                        </div>
-                    )}
+                            }}
+                        />
+                        {isLoading && (
+                            <div className="loading-overlay">
+                                <div className="spinner"></div>
+                                <p>Loading Video...</p>
+                            </div>
+                        )}
+                        {!playerError && autoplayBlocked && (
+                            <div className="start-video-overlay" onClick={handleStartVideo}>
+                                <button className="start-video-btn" onClick={(e) => {
+                                    e.stopPropagation(); // Prevent double triggering
+                                    handleStartVideo();
+                                }}>
+                                    Start Video
+                                </button>
+                            </div>
+                        )}
                         {playerError && (
                             <div className="player-error">
                                 <p>{playerError}</p>
@@ -345,14 +356,16 @@ export default function Tv2Page() {
                                 className="seek-bar"
                             />
                         </>
-                    )}                    <div className="control-buttons">                        {currentVideo && (<button
-                        onClick={handleTogglePlayPause}
-                        className={`play-pause-btn ${isPlaying ? 'playing' : 'paused'}`}
-                        aria-label={isPlaying ? "Pause video" : "Play video"}
-                    >
-                        {isPlaying ? "Pause" : "Play"}
-                    </button>
                     )}
+                    <div className="control-buttons">
+                        {currentVideo && (<button
+                            onClick={handleTogglePlayPause}
+                            className={`play-pause-btn ${isPlaying ? 'playing' : 'paused'}`}
+                            aria-label={isPlaying ? "Pause video" : "Play video"}
+                        >
+                            {isPlaying ? "Pause" : "Play"}
+                        </button>
+                        )}
                         <button onClick={handleLoadRandomVideo}>Play Something Else</button>
                     </div>
                 </div>

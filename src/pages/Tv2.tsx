@@ -395,7 +395,8 @@ export default function Tv2Page() {
                                 onChange={handleSeekChange}
                                 onMouseUp={handleSeekMouseUp}
                                 className="seek-bar"
-                            />                        </>)}
+                            />
+                        </>)}
 
                     <div className="control-buttons">
                         {currentVideo && (<button

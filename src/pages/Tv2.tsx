@@ -348,6 +348,7 @@ export default function Tv2Page() {
                             onReady={onPlayerReady}
                             onPlay={() => setIsPlaying(true)}
                             onPause={() => setIsPlaying(false)}
+                            onEnded={handleLoadRandomVideo} // Add this line
                             config={{
                                 file: {
                                     forceVideo: true,
@@ -414,7 +415,7 @@ export default function Tv2Page() {
                 <div className="move-overlay">
                     From Ben:
                     Mom,<br /><br />
-                    You agreed to this reminder to stand up and stretch every 30 minutes so you back will be in less pain:<br /><br />
+                    You agreed to this reminder to stand up and stretch every 30 minutes so you back will be in <b><i>less pain:</i></b><br /><br />
                     <ol>
                         <li>Turn your chair around and get out of your desk and look back at this screen</li>
                         <li>Stretch real high</li>

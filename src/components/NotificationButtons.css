@@ -4,7 +4,6 @@
     justify-content: center;
     gap: 10px;
     padding: 0 10px;
-    border-left: 1px solid #444;
     margin-left: 15px;
     min-height: 42px;
     /* Ensure consistent height */
@@ -15,22 +14,10 @@
     color: white;
     min-width: 80px;
     cursor: pointer;
-    padding: 12px 20px;
-    border-radius: 8px;
-    font-size: 1rem;
-    border: 1px solid #b71c1c;
     transition: background-color 0.2s, transform 0.1s;
     font-weight: bold;
 }
 
-.notification-buttons button:hover {
-    background-color: #b71c1c;
-}
-
-.notification-buttons button:active {
-    transform: scale(0.97);
-    background-color: #7f0000;
-}
 
 /* Status styles */
 .notification-status {

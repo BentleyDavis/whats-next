@@ -413,15 +413,23 @@ export default function Tv2Page() {
                 </div>
             </div>            {showMoveReminder && (
                 <div className="move-overlay">
-                    From Ben:
-                    Mom,<br /><br />
-                    You agreed to this reminder to stand up and stretch every 30 minutes so you back will be in <b><i>less pain:</i></b><br /><br />
-                    <ol>
-                        <li>Turn your chair around and get out of your desk and look back at this screen</li>
-                        <li>Stretch real high</li>
-                        <li>Get back in your desk chair</li>
-                        <li>Use your mouse to click the currect button below</li>
-                    </ol>
+                    <div style={{ padding: '20px' }}>
+                        From Ben:
+                        Mom,<br /><br />
+                        It is <b><i>very important</i></b> to do this stretch every 30 minutes to:
+                        <ul>
+                            <li>Save me time</li>
+                            <li>Ease your back pain</li>
+                        </ul>
+                        <hr />
+                        <ol>
+                            <li>Turn your chair around and get out of your desk</li>
+                            <li>look back at this screen</li>
+                            <li>Stretch real high for <b><i>10 Seconds</i></b></li>
+                            <li>Get back in your desk chair</li>
+                            <li>Use your mouse to click the currect button below</li>
+                        </ol>
+                    </div>
                     <div className="control-buttons">
                         <button
                             onClick={() => {
@@ -431,13 +439,13 @@ export default function Tv2Page() {
                             I Did It
                         </button>
 
-                        <button
+                        {/* <button
                             onClick={() => {
                                 handleDismissMoveReminder("Suzanne skipped an activity break");
                             }}
                         >
                             Skip this time
-                        </button>
+                        </button> */}
                     </div>
                 </div>
             )}

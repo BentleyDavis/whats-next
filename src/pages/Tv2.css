@@ -91,10 +91,15 @@
     font-size: 1rem;
     background-color: white;
     color: black;
-    border: 5px solid black;
-    border-radius: 10px;
+
     transition: background-color 0.2s;
     font-weight: bold;
+
+    border-radius: 20px;
+    outline: 4px solid currentColor;
+    outline-offset: -7px;
+
+    border: none
 }
 
 .control-buttons button:hover {
@@ -293,7 +298,7 @@
 .move-overlay button {
     background-color: #09f;
     color: white;
-    border-width: 5px;
+    /* border-width: 5px; */
 }
 
 .move-overlay button:hover {
@@ -324,6 +329,6 @@
 .play-pause-btn.throbbing {
     background-color: #2196F3 !important;
     color: white !important;
-    border-color: #1976D2 !important;
+    /* border-color: #1976D2 !important; */
     animation: throb 1.5s infinite;
 }

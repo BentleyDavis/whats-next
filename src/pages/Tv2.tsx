@@ -30,6 +30,21 @@ export default function Tv2Page() {
         return Math.round((now.getTime() - moveReminderStartTime.getTime()) / 1000);
     };
 
+    // New function to handle dismissing the move reminder
+    const handleDismissMoveReminder = (notificationMessage: string) => {
+        const durationSeconds = calculateActivityDuration();
+        const durationText = durationSeconds > 60
+            ? `${Math.floor(durationSeconds / 60)} minutes and ${durationSeconds % 60} seconds`
+            : `${durationSeconds} seconds`;
+        sendNotification(`${notificationMessage} (Duration: ${durationText})`);
+        setShowMoveReminder(false);
+        setMoveReminderStartTime(null);
+        setLastDismissedTimestamp(new Date()); // Set last dismissed timestamp
+        // Resume video playback
+        setIsPlaying(true);
+        startPlaying();
+    };
+
     // New function to start playing using playerRef
     const startPlaying = () => {
         if (!playerRef.current) return;
@@ -396,42 +411,27 @@ export default function Tv2Page() {
                 </div>
             </div>            {showMoveReminder && (
                 <div className="move-overlay">
-                    Suzanne,<br /><br />
-                    to fix your back pain you need to:<br /><br />
-
-                    Stand up and stretch real high<br /><br />
-
-                    then, click the correct button below<br /><br />                    <div className="control-buttons">                        <button
-                        onClick={() => {
-                            const durationSeconds = calculateActivityDuration();
-                            const durationText = durationSeconds > 60
-                                ? `${Math.floor(durationSeconds / 60)} minutes and ${durationSeconds % 60} seconds`
-                                : `${durationSeconds} seconds`;
-                            sendNotification(`Suzanne did the activity break (Duration: ${durationText})`);
-                            setShowMoveReminder(false);
-                            setMoveReminderStartTime(null);
-                            setLastDismissedTimestamp(new Date()); // Set last dismissed timestamp
-                            // Resume video playback
-                            setIsPlaying(true);
-                            startPlaying();
-                        }}
-                    >
-                        I Did It
-                    </button>
+                    From Ben:
+                    Mom,<br /><br />
+                    You agreed to this reminder to stand up and stretch every 30 minutes so you back will be in less pain:<br /><br />
+                    <ol>
+                        <li>Turn your chair around and get out of your desk and look back at this screen</li>
+                        <li>Stretch real high</li>
+                        <li>Get back in your desk chair</li>
+                        <li>Use your mouse to click the currect button below</li>
+                    </ol>
+                    <div className="control-buttons">
+                        <button
+                            onClick={() => {
+                                handleDismissMoveReminder("Suzanne did the activity break");
+                            }}
+                        >
+                            I Did It
+                        </button>
 
                         <button
                             onClick={() => {
-                                const durationSeconds = calculateActivityDuration();
-                                const durationText = durationSeconds > 60
-                                    ? `${Math.floor(durationSeconds / 60)} minutes and ${durationSeconds % 60} seconds`
-                                    : `${durationSeconds} seconds`;
-                                sendNotification(`Suzanne skipped an activity break (Duration shown: ${durationText})`);
-                                setShowMoveReminder(false);
-                                setMoveReminderStartTime(null);
-                                setLastDismissedTimestamp(new Date()); // Set last dismissed timestamp
-                                // Resume video playback
-                                setIsPlaying(true);
-                                startPlaying();
+                                handleDismissMoveReminder("Suzanne skipped an activity break");
                             }}
                         >
                             Skip this time

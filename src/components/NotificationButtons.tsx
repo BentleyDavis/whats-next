@@ -1,10 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import './NotificationButtons.css';
 import '../css/spinner.css';
-
-interface NotificationButtonsProps {
-    // No props needed, component is self-contained
-}
+import { sendNotification } from '../utils/notifications';
 
 // String constants for view states instead of enum
 const VIEW_STATE = {
@@ -17,7 +14,7 @@ const VIEW_STATE = {
 // Type for the view state
 type ViewStateType = typeof VIEW_STATE[keyof typeof VIEW_STATE];
 
-const NotificationButtons: React.FC<NotificationButtonsProps> = () => {
+const NotificationButtons = () => {
     const [viewState, setViewState] = useState<ViewStateType>(VIEW_STATE.BUTTONS);
     const [notificationMessage, setNotificationMessage] = useState<string>('');
     const [timerHandle, setTimerHandle] = useState<NodeJS.Timeout | null>(null);
@@ -30,30 +27,18 @@ const NotificationButtons: React.FC<NotificationButtonsProps> = () => {
                 clearTimeout(timerHandle);
             }
         };
-    }, [timerHandle]);
-
-    // Internal notification handler
-    const sendNotification = (message: string) => {
+    }, [timerHandle]);    // Internal notification handler
+    const sendNotificationButton = (message: string) => {
         return () => {
             // Set loading state and store the message
             setViewState(VIEW_STATE.LOADING);
             setNotificationMessage(message);
 
-            // Send notification to Discord webhook
-            fetch('https://discord.com/api/webhooks/1373408517028839425/-Q02wp1u8qUcOAOTvGQag8mPsMl1Ooln7ziI-wSMYsdLewcnKo5Dc1bP0ddiGOlKytbl', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    content: message,
-                })
-            }).then(response => {
-                if (response.ok) {
-                    console.log(`Notification sent: ${message}`);
+            // Use the direct notification service
+            sendNotification(message).then(result => {
+                if (result.success) {
                     setViewState(VIEW_STATE.SUCCESS);
                 } else {
-                    console.error('Failed to send notification');
                     setViewState(VIEW_STATE.ERROR);
                 }
 
@@ -63,19 +48,9 @@ const NotificationButtons: React.FC<NotificationButtonsProps> = () => {
                 }, 5 * 60 * 1000); // 5 minutes in milliseconds
 
                 setTimerHandle(handle);
-            }).catch(error => {
-                console.error('Error sending notification:', error);
-                setViewState(VIEW_STATE.ERROR);
-
-                // Set a timeout to revert back to buttons after 5 minutes
-                const handle = setTimeout(() => {
-                    setViewState(VIEW_STATE.BUTTONS);
-                }, 5 * 60 * 1000); // 5 minutes in milliseconds
-
-                setTimerHandle(handle);
             });
         };
-    };    // Render different content based on view state
+    };// Render different content based on view state
 
     // Handler to close notification and return to buttons
     const handleCloseNotification = () => {
@@ -112,15 +87,13 @@ const NotificationButtons: React.FC<NotificationButtonsProps> = () => {
                         <button className="close-button" onClick={handleCloseNotification}>×</button>
                         <p>❌ Error sending notification</p>
                     </div>
-                );
-            case VIEW_STATE.BUTTONS:
-            default:
-                return (<>
-                    <button onClick={sendNotification("Suzanne is Hungry!")}>Hungry</button>
-                    <button onClick={sendNotification("Suzanne is Thirsty!")}>Thirsty</button>
-                    <button onClick={sendNotification("Suzanne is in Pain!")}>Pain</button>
-                </>
-                );
+                ); case VIEW_STATE.BUTTONS:
+            default: return (<>
+                <button onClick={sendNotificationButton("Suzanne is Hungry!")}>Hungry</button>
+                <button onClick={sendNotificationButton("Suzanne is Thirsty!")}>Thirsty</button>
+                <button onClick={sendNotificationButton("Suzanne is in Pain!")}>Pain</button>
+            </>
+            );
         }
     };
 

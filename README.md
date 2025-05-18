@@ -6,6 +6,11 @@
 
 - old firebase  -   "firebase": "^10.12.2",
 
+# Project AI Context
+- Use TypeScript
+- never use enums
+- prefer `type` over `interface`
+- follow instructions exactly and do not add any extra features
 
 # Creation steps
 - `npm create @vite-pwa/pwa@latest whats-next -- --template react-ts`

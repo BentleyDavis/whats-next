@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import ReactPlayer from 'react-player';
 import './Tv2.css'; // Import CSS file for styles
 import NotificationButtons from '../components/NotificationButtons';
+import { sendNotification } from '../utils/notifications';
 
 // Server configuration
 const VIDEO_SERVER_URL = "http://localhost:3537";
@@ -15,7 +16,18 @@ export default function Tv2Page() {
     const [autoplayBlocked, setAutoplayBlocked] = useState(false);
     const [progress, setProgress] = useState(0);
     const [duration, setDuration] = useState(0);
+    const [showMoveReminder, setShowMoveReminder] = useState(false);
+    const [moveReminderStartTime, setMoveReminderStartTime] = useState<Date | null>(null);
     const playerRef = useRef<ReactPlayer>(null);
+
+    // Function to calculate duration of activity break in seconds
+    const calculateActivityDuration = (): number => {
+        if (!moveReminderStartTime) return 0;
+
+        const now = new Date();
+        // Calculate duration in seconds
+        return Math.round((now.getTime() - moveReminderStartTime.getTime()) / 1000);
+    };
 
     // New function to start playing using playerRef
     const startPlaying = () => {
@@ -106,7 +118,6 @@ export default function Tv2Page() {
         setIsLoading(true); // Set loading state to true when selecting a new video
         setAutoplayBlocked(false); // Clear autoplay blocked state when selecting a new video
 
-        playerRef.current?.seekTo(100);
         // Check if the path already has the server URL
         if (videoPath.startsWith('http://')) {
             setCurrentVideo(videoPath);
@@ -220,7 +231,9 @@ export default function Tv2Page() {
 
     const onPlayerDuration = (duration: number) => {
         setDuration(duration);
-    }; const handleTogglePlayPause = () => {
+    };
+
+    const handleTogglePlayPause = () => {
         // If autoplay was blocked, clear that state when user interacts
         if (autoplayBlocked) {
             setAutoplayBlocked(false);
@@ -246,9 +259,7 @@ export default function Tv2Page() {
     const handleSeekMouseUp = (e: React.MouseEvent<HTMLInputElement>) => {
         const time = parseFloat((e.target as HTMLInputElement).value);
         playerRef.current?.seekTo(time);
-    };
-
-    useEffect(() => {
+    }; useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
             if (e.code === 'Space') {
                 e.preventDefault();
@@ -258,6 +269,32 @@ export default function Tv2Page() {
 
         document.addEventListener('keydown', handleKeyDown);
         return () => document.removeEventListener('keydown', handleKeyDown);
+    }, [isPlaying]);
+
+    // Add timer to check for 15 and 45 minute marks
+    useEffect(() => {
+        const checkTimeForMoveReminder = () => {
+            console.log
+            if (!isPlaying) return; // Only check when video is playing
+
+            const now = new Date();
+            const minutes = now.getMinutes();            // Check if it's the 15th or 45th minute of the hour
+            if (minutes === 15 || minutes === 45) {
+                setShowMoveReminder(true);
+                // Set the start time for timing the activity break
+                setMoveReminderStartTime(new Date());
+                // Pause the video
+                setIsPlaying(false);
+                stopPlaying();
+
+                // No longer auto-hide the reminder - user must dismiss it
+            }
+        };
+
+        // Check every 15 seconds
+        const intervalId = setInterval(checkTimeForMoveReminder, 10000);
+
+        return () => clearInterval(intervalId);
     }, [isPlaying]);
 
     return (
@@ -308,13 +345,13 @@ export default function Tv2Page() {
                             <div className="loading-overlay">
                                 <div className="spinner"></div>
                                 <p>Loading Video...</p>
-                            </div>)}
-                        {playerError && (
-                            <div className="player-error">
-                                <p>{playerError}</p>
-                                <p className="small">Please select another video</p>
-                            </div>
-                        )}
+                            </div>)}                        {playerError && (
+                                <div className="player-error">
+                                    <p>{playerError}</p>
+                                    <p className="small">Please select another video</p>
+                                </div>
+                            )}
+
                     </div>
                 ) : (
                     <div className="no-video-message">
@@ -351,7 +388,51 @@ export default function Tv2Page() {
                         <NotificationButtons />
                     </div>
                 </div>
-            </div>
+            </div>            {showMoveReminder && (
+                <div className="move-overlay">
+                    It's time to stretch and move around!<br /><br />
+
+                    Stand up and stretch real high<br /><br />
+
+                    when you are done, click the button below<br /><br />                    <div className="control-buttons">                        <button
+                        onClick={() => {
+                            const durationSeconds = calculateActivityDuration();
+                            const durationText = durationSeconds > 60
+                                ? `${Math.floor(durationSeconds / 60)} minutes and ${durationSeconds % 60} seconds`
+                                : `${durationSeconds} seconds`;
+                            sendNotification(`Suzanne did the activity break (Duration: ${durationText})`);
+                            setShowMoveReminder(false);
+                            setMoveReminderStartTime(null);
+                            // Resume video playback
+                            setIsPlaying(true);
+                            startPlaying();
+                        }}
+                    >
+                        I Did It
+                    </button>
+
+                        <button
+                            onClick={() => {
+                                const durationSeconds = calculateActivityDuration();
+                                const durationText = durationSeconds > 60
+                                    ? `${Math.floor(durationSeconds / 60)} minutes and ${durationSeconds % 60} seconds`
+                                    : `${durationSeconds} seconds`;
+                                sendNotification(`Suzanne skipped an activity break (Duration shown: ${durationText})`);
+                                setShowMoveReminder(false);
+                                setMoveReminderStartTime(null);
+                                // Resume video playback
+                                setIsPlaying(true);
+                                startPlaying();
+                            }}
+                        >
+                            Skip this time
+                        </button>
+                    </div>
+                </div>
+            )}
+
         </div >
+
+
     );
 }

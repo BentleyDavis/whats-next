@@ -3,9 +3,10 @@ import ReactPlayer from 'react-player';
 import './Tv2.css'; // Import CSS file for styles
 import NotificationButtons from '../components/NotificationButtons';
 import { sendNotification } from '../utils/notifications';
+import { appConfig } from '@/appConfig';
 
 // Server configuration
-const VIDEO_SERVER_URL = "http://localhost:3537";
+const videoServerUrl = "http://localhost:3537";
 
 export default function Tv2Page() {
     const [localVideos, setLocalVideos] = useState<string[]>([]);
@@ -104,7 +105,7 @@ export default function Tv2Page() {
             "C:/Videos/concert_recording.mp4"
         ];
 
-        fetch(`${VIDEO_SERVER_URL}/list-videos`)
+        fetch(`${videoServerUrl}/list-videos`)
             .then(res => res.json())
             .then(files => {
                 setLocalVideos(files);
@@ -140,7 +141,7 @@ export default function Tv2Page() {
         } else {            // Add the server URL prefix to the video path
             // Make sure to avoid double slashes by removing any leading slash from videoPath
             const cleanPath = videoPath.startsWith('/') ? videoPath.substring(1) : videoPath;
-            const fullVideoUrl = `${VIDEO_SERVER_URL}/${cleanPath}`;
+            const fullVideoUrl = `${videoServerUrl}/${cleanPath}`;
             setCurrentVideo(fullVideoUrl);
         }
 
@@ -159,7 +160,7 @@ export default function Tv2Page() {
         // Get the current video path without the server URL prefix
         let currentVideoPath = null;
         if (currentVideo) {
-            currentVideoPath = currentVideo.replace(VIDEO_SERVER_URL + '/', '');
+            currentVideoPath = currentVideo.replace(videoServerUrl + '/', '');
         }
 
         // Get all videos except the current one
@@ -440,8 +441,9 @@ export default function Tv2Page() {
                 </div>
             )}
 
+            <div style={{ position: 'absolute', bottom: 2, right: 2, color: 'white', opacity: 0.1, fontSize: '0.75em' }}>
+                {appConfig.version}
+            </div>
         </div >
-
-
     );
 }

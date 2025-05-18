@@ -220,9 +220,7 @@ export default function Tv2Page() {
 
     const onPlayerDuration = (duration: number) => {
         setDuration(duration);
-    };
-
-    const handleTogglePlayPause = () => {
+    }; const handleTogglePlayPause = () => {
         // If autoplay was blocked, clear that state when user interacts
         if (autoplayBlocked) {
             setAutoplayBlocked(false);
@@ -238,15 +236,6 @@ export default function Tv2Page() {
         } else {
             stopPlaying();
         }
-    };
-
-    const handleStartVideo = () => {
-        // Clear autoplay blocked state immediately
-        setAutoplayBlocked(false);
-        setIsPlaying(true);
-
-        // Use the new startPlaying function
-        startPlaying();
     };
 
     const handleSeekChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -319,18 +308,7 @@ export default function Tv2Page() {
                             <div className="loading-overlay">
                                 <div className="spinner"></div>
                                 <p>Loading Video...</p>
-                            </div>
-                        )}
-                        {!playerError && autoplayBlocked && (
-                            <div className="start-video-overlay" onClick={handleStartVideo}>
-                                <button className="start-video-btn" onClick={(e) => {
-                                    e.stopPropagation(); // Prevent double triggering
-                                    handleStartVideo();
-                                }}>
-                                    Start Video
-                                </button>
-                            </div>
-                        )}
+                            </div>)}
                         {playerError && (
                             <div className="player-error">
                                 <p>{playerError}</p>
@@ -362,7 +340,7 @@ export default function Tv2Page() {
                     <div className="control-buttons">
                         {currentVideo && (<button
                             onClick={handleTogglePlayPause}
-                            className={`play-pause-btn ${isPlaying ? 'playing' : 'paused'}`}
+                            className={`play-pause-btn ${autoplayBlocked ? 'throbbing' : ''}`}
                             aria-label={isPlaying ? "Pause video" : "Play video"}
                         >
                             {isPlaying ? "Pause" : "Play"}

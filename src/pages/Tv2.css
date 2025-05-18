@@ -236,69 +236,20 @@
     }
 }
 
-.start-video-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.7);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 15;
-    /* Higher than regular elements but lower than error */
-    flex-direction: column;
-    cursor: pointer;
-    /* Show pointer cursor on the entire overlay */
-}
+/* Removed the start video overlay styles as we're no longer using them */
 
-.start-video-overlay p {
-    color: white;
-    font-size: 1.5rem;
-    margin-bottom: 30px;
-    text-align: center;
-    max-width: 80%;
-}
-
-.start-video-btn {
-    padding: 25px 50px;
-    min-width: 250px;
-    border-radius: 15px;
-    font-size: 2rem;
-    background-color: #2196F3;
-    color: white;
-    border: none;
-    cursor: pointer;
-    font-weight: bold;
-    /* box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); */
-    transition: transform 0.2s, background-color 0.2s;
-    animation: pulse 1.5s infinite alternate;
-}
-
-@keyframes pulse {
+@keyframes throb {
     0% {
         transform: scale(1);
-        /* box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); */
+    }
+
+    50% {
+        transform: scale(1.15);
     }
 
     100% {
-        transform: scale(1.15);
-        /* box-shadow: 0 12px 24px rgba(33, 150, 243, 0.4); */
+        transform: scale(1);
     }
-}
-
-/* .start-video-btn:hover {
-    animation: none;
-    transform: scale(1.08);
-    background-color: #0d84e0;
-    box-shadow: 0 12px 24px rgba(33, 150, 243, 0.6);
-} */
-
-.start-video-btn:active {
-    animation: none;
-    transform: scale(0.98);
-    background-color: #0b76ca;
 }
 
 /* Play/Pause button styling */
@@ -308,13 +259,13 @@
     transition: background-color 0.3s !important;
 }
 
-.play-pause-btn.playing {
-    background-color: #f8f8f8 !important;
-    border-color: #aaa !important;
-}
-
-.play-pause-btn.paused {
+/* Changed the styles to match the requirements:
+   - Normal play button is white (default)
+   - When paused, it stays white (not blue anymore)
+   - Only blue when autoplay is blocked (throbbing) */
+.play-pause-btn.throbbing {
     background-color: #2196F3 !important;
     color: white !important;
     border-color: #1976D2 !important;
+    animation: throb 1.5s infinite;
 }

@@ -417,7 +417,7 @@ export default function Tv2Page() {
                     <div style={{ padding: '20px' }}>
                         From Ben:
                         Mom,<br /><br />
-                        It is <b><i>very important</i></b> to do this stretch every 30 minutes to:
+                        It is <b><i>very important</i></b> to stand up every 30 minutes to:
                         <ul>
                             <li>Save me time</li>
                             <li>Ease your back pain</li>
@@ -425,8 +425,7 @@ export default function Tv2Page() {
                         <hr />
                         <ol>
                             <li>Turn your chair around and get out of your desk</li>
-                            <li>look back at this screen</li>
-                            <li>Stretch real high for <b><i>10 Seconds</i></b></li>
+                            <li>Stand or walk around for a minute</li>
                             <li>Get back in your desk chair</li>
                             <li>Use your mouse to click the currect button below</li>
                         </ol>

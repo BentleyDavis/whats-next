@@ -18,6 +18,7 @@ export default function Tv2Page() {
     const [duration, setDuration] = useState(0);
     const [showMoveReminder, setShowMoveReminder] = useState(false);
     const [moveReminderStartTime, setMoveReminderStartTime] = useState<Date | null>(null);
+    const [lastDismissedTimestamp, setLastDismissedTimestamp] = useState<Date | null>(null); // Changed state
     const playerRef = useRef<ReactPlayer>(null);
 
     // Function to calculate duration of activity break in seconds
@@ -278,8 +279,13 @@ export default function Tv2Page() {
             if (!isPlaying) return; // Only check when video is playing
 
             const now = new Date();
-            const minutes = now.getMinutes();            // Check if it's the 15th or 45th minute of the hour
-            if (minutes === 15 || minutes === 45) {
+            const currentMinutes = now.getMinutes();
+
+            // Check if it's the 15th or 45th minute of the hour and if it hasn't been dismissed in the last minute
+            if (
+                (currentMinutes === 15 || currentMinutes === 45) &&
+                (!lastDismissedTimestamp || now.getTime() - lastDismissedTimestamp.getTime() >= 60000) // 60000 ms = 1 minute
+            ) {
                 setShowMoveReminder(true);
                 // Set the start time for timing the activity break
                 setMoveReminderStartTime(new Date());
@@ -291,11 +297,11 @@ export default function Tv2Page() {
             }
         };
 
-        // Check every 15 seconds
+        // Check every 10 seconds (reduced from 15 for slightly faster checks, can be adjusted)
         const intervalId = setInterval(checkTimeForMoveReminder, 10000);
 
         return () => clearInterval(intervalId);
-    }, [isPlaying]);
+    }, [isPlaying, lastDismissedTimestamp]); // Updated dependency
 
     return (
         <div className="tv-container">
@@ -404,6 +410,7 @@ export default function Tv2Page() {
                             sendNotification(`Suzanne did the activity break (Duration: ${durationText})`);
                             setShowMoveReminder(false);
                             setMoveReminderStartTime(null);
+                            setLastDismissedTimestamp(new Date()); // Set last dismissed timestamp
                             // Resume video playback
                             setIsPlaying(true);
                             startPlaying();
@@ -421,6 +428,7 @@ export default function Tv2Page() {
                                 sendNotification(`Suzanne skipped an activity break (Duration shown: ${durationText})`);
                                 setShowMoveReminder(false);
                                 setMoveReminderStartTime(null);
+                                setLastDismissedTimestamp(new Date()); // Set last dismissed timestamp
                                 // Resume video playback
                                 setIsPlaying(true);
                                 startPlaying();

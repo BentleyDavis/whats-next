@@ -390,11 +390,12 @@ export default function Tv2Page() {
                 </div>
             </div>            {showMoveReminder && (
                 <div className="move-overlay">
-                    It's time to stretch and move around!<br /><br />
+                    Suzanne,<br /><br />
+                    to fix your back pain you need to:<br /><br />
 
                     Stand up and stretch real high<br /><br />
 
-                    when you are done, click the button below<br /><br />                    <div className="control-buttons">                        <button
+                    then, click the correct button below<br /><br />                    <div className="control-buttons">                        <button
                         onClick={() => {
                             const durationSeconds = calculateActivityDuration();
                             const durationText = durationSeconds > 60

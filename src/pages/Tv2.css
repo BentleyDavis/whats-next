@@ -102,14 +102,6 @@
     border: none
 }
 
-.control-buttons button:hover {
-    background-color: #f0f0f0;
-}
-
-.control-buttons button:active {
-    background-color: #e0e0e0;
-}
-
 .playback-controls input[type="range"] {
     width: 95%;
 }
@@ -195,15 +187,6 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-}
-
-.video-controls li:hover {
-    background-color: #666;
-}
-
-.video-controls li.active {
-    background-color: #666;
-    border-left: 3px solid #09f;
 }
 
 .loading-overlay {
@@ -299,10 +282,6 @@
     background-color: #09f;
     color: white;
     /* border-width: 5px; */
-}
-
-.move-overlay button:hover {
-    background-color: blue;
 }
 
 @keyframes fadeIn {

@@ -58,14 +58,6 @@
     transition: background-color 0.2s;
 }
 
-.notification-status .close-button:hover {
-    background-color: rgba(0, 0, 0, 0.4);
-}
-
-.notification-status .close-button:active {
-    background-color: rgba(0, 0, 0, 0.6);
-}
-
 .notification-status.loading {
     background-color: #f5f5f5;
     color: #333;

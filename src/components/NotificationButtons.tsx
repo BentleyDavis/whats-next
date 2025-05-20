@@ -92,6 +92,7 @@ const NotificationButtons = () => {
                 <button onClick={sendNotificationButton("Suzanne is Hungry!")}>Hungry</button>
                 <button onClick={sendNotificationButton("Suzanne is Thirsty!")}>Thirsty</button>
                 <button onClick={sendNotificationButton("Suzanne is in Pain!")}>Pain</button>
+                <button onClick={sendNotificationButton("Suzanne has a question!")}>Question</button>
             </>
             );
         }

@@ -5,7 +5,7 @@ import HomePage from "./Home";
 import WeatherPage from "./Weather";
 import TvPage from "./Tv";
 import Tv2Page from "./Tv2";
-
+import BT from "./BT"; // Import the new BT component
 
 export const router = createBrowserRouter([
     {
@@ -16,6 +16,10 @@ export const router = createBrowserRouter([
             {
                 path: "/weather",
                 element: <WeatherPage />,
+            },
+            {
+                path: "/bt", // Add the new route for BT page
+                element: <BT />,
             },
             {
                 path: "/tv",

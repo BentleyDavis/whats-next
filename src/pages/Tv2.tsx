@@ -37,7 +37,7 @@ export default function Tv2Page() {
         const durationText = durationSeconds > 60
             ? `${Math.floor(durationSeconds / 60)} minutes and ${durationSeconds % 60} seconds`
             : `${durationSeconds} seconds`;
-        sendNotification(`${notificationMessage} (Duration: ${durationText})`);
+        sendNotification(`${notificationMessage} (Duration: ${durationText})`, 'fyi');
         setShowMoveReminder(false);
         setMoveReminderStartTime(null);
         setLastDismissedTimestamp(new Date()); // Set last dismissed timestamp

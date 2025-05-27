@@ -1,8 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import ReactPlayer from 'react-player';
 import './Tv2.css'; // Import CSS file for styles
-import NotificationButtons from '../components/NotificationButtons';
-import { sendNotification } from '../utils/notifications';
+// import { sendNotification } from '../utils/notifications';
 import { appConfig } from '@/appConfig';
 
 // Server configuration
@@ -17,34 +16,34 @@ export default function Tv2Page() {
     const [autoplayBlocked, setAutoplayBlocked] = useState(false);
     const [progress, setProgress] = useState(0);
     const [duration, setDuration] = useState(0);
-    const [showMoveReminder, setShowMoveReminder] = useState(false);
-    const [moveReminderStartTime, setMoveReminderStartTime] = useState<Date | null>(null);
-    const [lastDismissedTimestamp, setLastDismissedTimestamp] = useState<Date | null>(null); // Changed state
+    // const [showMoveReminder, setShowMoveReminder] = useState(false);
+    // const [moveReminderStartTime, setMoveReminderStartTime] = useState<Date | null>(null);
+    // const [lastDismissedTimestamp, setLastDismissedTimestamp] = useState<Date | null>(null); // Changed state
     const playerRef = useRef<ReactPlayer>(null);
 
     // Function to calculate duration of activity break in seconds
-    const calculateActivityDuration = (): number => {
-        if (!moveReminderStartTime) return 0;
+    // const calculateActivityDuration = (): number => {
+    //     if (!moveReminderStartTime) return 0;
 
-        const now = new Date();
-        // Calculate duration in seconds
-        return Math.round((now.getTime() - moveReminderStartTime.getTime()) / 1000);
-    };
+    //     const now = new Date();
+    //     // Calculate duration in seconds
+    //     return Math.round((now.getTime() - moveReminderStartTime.getTime()) / 1000);
+    // };
 
     // New function to handle dismissing the move reminder
-    const handleDismissMoveReminder = (notificationMessage: string) => {
-        const durationSeconds = calculateActivityDuration();
-        const durationText = durationSeconds > 60
-            ? `${Math.floor(durationSeconds / 60)} minutes and ${durationSeconds % 60} seconds`
-            : `${durationSeconds} seconds`;
-        sendNotification(`${notificationMessage} (Duration: ${durationText})`, 'fyi');
-        setShowMoveReminder(false);
-        setMoveReminderStartTime(null);
-        setLastDismissedTimestamp(new Date()); // Set last dismissed timestamp
-        // Resume video playback
-        setIsPlaying(true);
-        startPlaying();
-    };
+    // const handleDismissMoveReminder = (notificationMessage: string) => {
+    //     const durationSeconds = calculateActivityDuration();
+    //     const durationText = durationSeconds > 60
+    //         ? `${Math.floor(durationSeconds / 60)} minutes and ${durationSeconds % 60} seconds`
+    //         : `${durationSeconds} seconds`;
+    //     sendNotification(`${notificationMessage} (Duration: ${durationText})`, 'fyi');
+    //     setShowMoveReminder(false);
+    //     setMoveReminderStartTime(null);
+    //     setLastDismissedTimestamp(new Date()); // Set last dismissed timestamp
+    //     // Resume video playback
+    //     setIsPlaying(true);
+    //     startPlaying();
+    // };
 
     // New function to start playing using playerRef
     const startPlaying = () => {
@@ -288,7 +287,7 @@ export default function Tv2Page() {
         return () => document.removeEventListener('keydown', handleKeyDown);
     }, [isPlaying]);
 
-    // // Add timer to check for 15 and 45 minute marks
+    // Add timer to check for 15 and 45 minute marks
     // useEffect(() => {
     //     const checkTimeForMoveReminder = () => {
     //         console.log
@@ -409,10 +408,9 @@ export default function Tv2Page() {
 
                         <button onClick={handleLoadRandomVideo}>Play Something Else</button>
 
-                        {/*   <NotificationButtons />  */}
                     </div>
                 </div>
-            </div>            {showMoveReminder && (
+            </div>            {/* {showMoveReminder && (
                 <div className="move-overlay">
                     <div style={{ padding: '20px' }}>
                         From Ben:
@@ -445,10 +443,10 @@ export default function Tv2Page() {
                             }}
                         >
                             Skip this time
-                        </button> */}
+                        </button> * /}
                     </div>
                 </div>
-            )}
+            )} */}
 
             <div style={{ position: 'absolute', bottom: 2, right: 2, color: 'white', opacity: 0.1, fontSize: '0.75em' }}>
                 {appConfig.version}

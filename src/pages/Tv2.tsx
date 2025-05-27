@@ -404,10 +404,10 @@ export default function Tv2Page() {
                             className={`play-pause-btn ${autoplayBlocked ? 'throbbing' : ''}`}
                             aria-label={isPlaying ? "Pause video" : "Play video"}
                         >
-                            {isPlaying ? "Pause" : "Play"}
+                            {isPlaying ? "⏸︎ Pause" : "▶ Play"}
                         </button>)}
 
-                        <button onClick={handleLoadRandomVideo}>Play Something Else</button>
+                        <button onClick={handleLoadRandomVideo}>Something Else</button>
 
                         <NotificationButtons />
 

@@ -88,7 +88,6 @@
     cursor: pointer;
     padding: 12px 20px;
     min-width: 100px;
-    font-size: 1rem;
     background-color: white;
     color: black;
 
@@ -147,6 +146,7 @@
 
 .playback-controls button {
     cursor: pointer;
+    font-size: 2rem;
 }
 
 .playback-controls input[type="range"] {

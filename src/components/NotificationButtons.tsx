@@ -89,10 +89,12 @@ const NotificationButtons = () => {
                     </div>
                 ); case VIEW_STATE.BUTTONS:
             default: return (<>
-                <button onClick={sendNotificationButton("Suzanne is Hungry!")}>Hungry</button>
+                {/* <button onClick={sendNotificationButton("Suzanne is Hungry!")}>Hungry</button>
                 <button onClick={sendNotificationButton("Suzanne is Thirsty!")}>Thirsty</button>
                 <button onClick={sendNotificationButton("Suzanne is in Pain!")}>Pain</button>
-                <button onClick={sendNotificationButton("Suzanne has a question!")}>Question</button>
+                <button onClick={sendNotificationButton("Suzanne has a question!")}>Question</button> */}
+                <button onClick={sendNotificationButton("Suzanne Asked for Ben!")}>Contact Ben</button>
+
             </>
             );
         }

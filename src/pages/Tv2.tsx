@@ -3,6 +3,7 @@ import ReactPlayer from 'react-player';
 import './Tv2.css'; // Import CSS file for styles
 // import { sendNotification } from '../utils/notifications';
 import { appConfig } from '@/appConfig';
+import NotificationButtons from '@/components/NotificationButtons';
 
 // Server configuration
 const videoServerUrl = "http://localhost:3537";
@@ -407,6 +408,9 @@ export default function Tv2Page() {
                         </button>)}
 
                         <button onClick={handleLoadRandomVideo}>Play Something Else</button>
+
+                        <NotificationButtons />
+
 
                     </div>
                 </div>

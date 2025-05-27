@@ -288,36 +288,36 @@ export default function Tv2Page() {
         return () => document.removeEventListener('keydown', handleKeyDown);
     }, [isPlaying]);
 
-    // Add timer to check for 15 and 45 minute marks
-    useEffect(() => {
-        const checkTimeForMoveReminder = () => {
-            console.log
-            if (!isPlaying) return; // Only check when video is playing
+    // // Add timer to check for 15 and 45 minute marks
+    // useEffect(() => {
+    //     const checkTimeForMoveReminder = () => {
+    //         console.log
+    //         if (!isPlaying) return; // Only check when video is playing
 
-            const now = new Date();
-            const currentMinutes = now.getMinutes();
+    //         const now = new Date();
+    //         const currentMinutes = now.getMinutes();
 
-            // Check if it's the 15th or 45th minute of the hour and if it hasn't been dismissed in the last minute
-            if (
-                (currentMinutes === 15 || currentMinutes === 45) &&
-                (!lastDismissedTimestamp || now.getTime() - lastDismissedTimestamp.getTime() >= 60000) // 60000 ms = 1 minute
-            ) {
-                setShowMoveReminder(true);
-                // Set the start time for timing the activity break
-                setMoveReminderStartTime(new Date());
-                // Pause the video
-                setIsPlaying(false);
-                stopPlaying();
+    //         // Check if it's the 15th or 45th minute of the hour and if it hasn't been dismissed in the last minute
+    //         if (
+    //             (currentMinutes === 15 || currentMinutes === 45) &&
+    //             (!lastDismissedTimestamp || now.getTime() - lastDismissedTimestamp.getTime() >= 60000) // 60000 ms = 1 minute
+    //         ) {
+    //             setShowMoveReminder(true);
+    //             // Set the start time for timing the activity break
+    //             setMoveReminderStartTime(new Date());
+    //             // Pause the video
+    //             setIsPlaying(false);
+    //             stopPlaying();
 
-                // No longer auto-hide the reminder - user must dismiss it
-            }
-        };
+    //             // No longer auto-hide the reminder - user must dismiss it
+    //         }
+    //     };
 
-        // Check every 10 seconds (reduced from 15 for slightly faster checks, can be adjusted)
-        const intervalId = setInterval(checkTimeForMoveReminder, 10000);
+    //     // Check every 10 seconds (reduced from 15 for slightly faster checks, can be adjusted)
+    //     const intervalId = setInterval(checkTimeForMoveReminder, 10000);
 
-        return () => clearInterval(intervalId);
-    }, [isPlaying, lastDismissedTimestamp]); // Updated dependency
+    //     return () => clearInterval(intervalId);
+    // }, [isPlaying, lastDismissedTimestamp]);
 
     return (
         <div className="tv-container">
@@ -409,7 +409,7 @@ export default function Tv2Page() {
 
                         <button onClick={handleLoadRandomVideo}>Play Something Else</button>
 
-                        <NotificationButtons />
+                        {/*   <NotificationButtons />  */}
                     </div>
                 </div>
             </div>            {showMoveReminder && (

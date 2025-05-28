@@ -30,8 +30,12 @@ export const router = createBrowserRouter([
                 element: <Tv2Page />,
             },
             {
-                path: "/",
+                path: "/home",
                 element: <HomePage />,
+            },
+            {
+                path: "/",
+                element: <Tv2Page />,
             },
         ],
     },

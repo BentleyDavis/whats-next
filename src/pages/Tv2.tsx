@@ -451,24 +451,14 @@ export default function Tv2Page() {
                             aria-label={isPlaying ? "Pause video" : "Play video"}
                         >
                             {isPlaying ? "⏸︎ Pause" : "▶ Play"}
-                        </button>)}                        <button onClick={handleLoadRandomVideo}>Something Else</button>                        <div className="volume-grid">
-                            <span className="volume-label">Volume {Math.round(volume * 100)}%</span>
-                            <button
-                                onClick={handleVolumeUp}
-                                className="volume-btn up"
-                                aria-label="Increase volume"
-                                disabled={volume >= maxVolume}
-                            >
-                                ▲
-                            </button>
-                            <button
-                                onClick={handleVolumeDown}
-                                className="volume-btn down"
-                                aria-label="Decrease volume"
-                                disabled={volume <= minVolume}
-                            >
-                                ▼
-                            </button>
+                        </button>)}
+
+
+                        <button onClick={handleLoadRandomVideo}>Something Else</button>
+
+
+                        <div className="volume-controls-row" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                            <span className="volume-label">Volume</span>
                             <input
                                 type="range"
                                 min={minVolume}

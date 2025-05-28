@@ -27,6 +27,7 @@ export default function Tv2Page() {
     // const [moveReminderStartTime, setMoveReminderStartTime] = useState<Date | null>(null);
     // const [lastDismissedTimestamp, setLastDismissedTimestamp] = useState<Date | null>(null); // Changed state
     const playerRef = useRef<ReactPlayer>(null);
+    const [showOverlay, setShowOverlay] = useState(false);
 
     // Function to calculate duration of activity break in seconds
     // const calculateActivityDuration = (): number => {
@@ -365,8 +366,80 @@ export default function Tv2Page() {
     //     return () => clearInterval(intervalId);
     // }, [isPlaying, lastDismissedTimestamp]);
 
+    // Handler for close (X) button
+    const handleShowOverlay = () => {
+        setShowOverlay(true);
+    };
+
+    // Handler for mouse movement to hide overlay with delay
+    useEffect(() => {
+        if (!showOverlay) return;
+        let canDismiss = false;
+        const enableDismissTimeout = setTimeout(() => {
+            canDismiss = true;
+        }, 5000);
+        const handleMouseMove = () => {
+            if (canDismiss) {
+                setShowOverlay(false);
+            }
+        };
+        window.addEventListener('mousemove', handleMouseMove);
+        return () => {
+            clearTimeout(enableDismissTimeout);
+            window.removeEventListener('mousemove', handleMouseMove);
+        };
+    }, [showOverlay]);
+
     return (
         <div className="tv-container">
+            {showOverlay && (
+                <div style={{
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    width: '100vw',
+                    height: '100vh',
+                    background: '#000',
+                    zIndex: 10001, // higher than the X button
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexDirection: 'column',
+                }}>
+                    {/* No text, just a black overlay */}
+                </div>
+            )}
+            <button
+                onClick={handleShowOverlay}
+                aria-label="Close"
+                style={{
+                    position: 'fixed',
+                    top: 2,
+                    right: 2,
+                    background: '#e81123',
+                    border: 'none',
+                    color: 'white',
+                    borderRadius: '2px',
+                    width: '32px',
+                    height: '32px',
+                    fontSize: '1.5em',
+                    fontWeight: 'bold',
+                    boxShadow: '0 1px 2px rgba(0,0,0,0.2)',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    transition: 'background 0.2s',
+                    zIndex: 10000, // lower than overlay
+                    padding: 0,
+                    lineHeight: 1,
+                }}
+            >
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ display: 'block' }}>
+                    <line x1="4.5" y1="4.5" x2="13.5" y2="13.5" stroke="white" strokeWidth="2" strokeLinecap="round" />
+                    <line x1="13.5" y1="4.5" x2="4.5" y2="13.5" stroke="white" strokeWidth="2" strokeLinecap="round" />
+                </svg>
+            </button>
             <div className="video-display">
                 {currentVideo ? (
                     <div className="player-wrapper" onClick={handleTogglePlayPause}>

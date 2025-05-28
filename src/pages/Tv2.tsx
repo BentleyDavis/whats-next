@@ -1,9 +1,10 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import ReactPlayer from 'react-player';
 import './Tv2.css'; // Import CSS file for styles
 // import { sendNotification } from '../utils/notifications';
 import { appConfig } from '@/appConfig';
 import NotificationButtons from '@/components/NotificationButtons';
+import { useLocalStorage } from '@uidotdev/usehooks';
 
 // Server configuration
 const videoServerUrl = "http://localhost:3537";
@@ -14,9 +15,14 @@ export default function Tv2Page() {
     const [playerError, setPlayerError] = useState<string | null>(null);
     const [isPlaying, setIsPlaying] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    const [autoplayBlocked, setAutoplayBlocked] = useState(false);
-    const [progress, setProgress] = useState(0);
+    const [autoplayBlocked, setAutoplayBlocked] = useState(false); const [progress, setProgress] = useState(0);
     const [duration, setDuration] = useState(0);
+    // Volume control variables
+    const minVolume = 0;
+    const maxVolume = 1;
+    const volumeSteps = 10;
+    const volumeStepSize = maxVolume / volumeSteps;
+    const [volume, setVolume] = useLocalStorage('volume', 0.5); // Initial volume at 50%
     // const [showMoveReminder, setShowMoveReminder] = useState(false);
     // const [moveReminderStartTime, setMoveReminderStartTime] = useState<Date | null>(null);
     // const [lastDismissedTimestamp, setLastDismissedTimestamp] = useState<Date | null>(null); // Changed state
@@ -95,36 +101,48 @@ export default function Tv2Page() {
         }
     };
 
-    useEffect(() => {
-        // Dummy data to use if fetch fails
-        const dummyVideos = [
-            "C:/Videos/nature_documentary.mp4",
-            "C:/Videos/vacation_2024.mp4",
-            "C:/Videos/family_gathering.mp4",
-            "C:/Videos/tutorial_react.mp4",
-            "C:/Videos/concert_recording.mp4"
-        ];
+    // Helper function for improved randomization using timestamp
+    const getRandomIndex = (max: number) => {
+        // Use current timestamp in milliseconds as part of the seed
+        const timestamp = new Date().getTime();
+        // Create a more random value by combining Math.random with the timestamp
+        const randomValue = Math.sin(timestamp) * 10000;
+        // Get a value between 0 and 1 by using the decimal part
+        const normalizedRandom = Math.abs(randomValue - Math.floor(randomValue));
+        // Scale to the max value and floor to get an integer index
+        return Math.floor(normalizedRandom * max);
+    };
 
+    useEffect(() => {
         fetch(`${videoServerUrl}/list-videos`)
             .then(res => res.json())
             .then(files => {
-                setLocalVideos(files);
+                // Process all video paths immediately to normalize them
+                const processedVideos = files.map((videoPath: string) => {
+                    // If the path already has the server URL, use it as is
+                    if (videoPath.startsWith('http://')) {
+                        return videoPath;
+                    } else {
+                        // Make sure to avoid double slashes by removing any leading slash
+                        const cleanPath = videoPath.startsWith('/') ? videoPath.substring(1) : videoPath;
+                        return `${videoServerUrl}/${cleanPath}`;
+                    }
+                });
+
+                setLocalVideos(processedVideos);
 
                 // Load a random video at startup
-                if (files.length > 0) {
-                    const randomIndex = Math.floor(Math.random() * files.length);
-                    handleVideoSelect(files[randomIndex], true);
+                if (processedVideos.length > 0) {
+                    const randomIndex = getRandomIndex(processedVideos.length);
+                    setCurrentVideo(processedVideos[randomIndex]);
+                    setIsPlaying(true);
+                    setAutoplayBlocked(false);
                 }
             })
             .catch(_error => {
-                // Use dummy data if fetch fails
-                setLocalVideos(dummyVideos);
-
-                // Load a random dummy video
-                if (dummyVideos.length > 0) {
-                    const randomIndex = Math.floor(Math.random() * dummyVideos.length);
-                    handleVideoSelect(dummyVideos[randomIndex], true);
-                }
+                console.error("Failed to load videos:", _error);
+                // No dummy videos fallback anymore
+                setLocalVideos([]);
             });
     }, []);
 
@@ -135,15 +153,9 @@ export default function Tv2Page() {
         setIsLoading(true); // Set loading state to true when selecting a new video
         setAutoplayBlocked(false); // Clear autoplay blocked state when selecting a new video
 
-        // Check if the path already has the server URL
-        if (videoPath.startsWith('http://')) {
-            setCurrentVideo(videoPath);
-        } else {            // Add the server URL prefix to the video path
-            // Make sure to avoid double slashes by removing any leading slash from videoPath
-            const cleanPath = videoPath.startsWith('/') ? videoPath.substring(1) : videoPath;
-            const fullVideoUrl = `${videoServerUrl}/${cleanPath}`;
-            setCurrentVideo(fullVideoUrl);
-        }
+        // Since all video paths in localVideos are already fully formed URLs,
+        // we can just set the current video directly
+        setCurrentVideo(videoPath);
 
         // If autoPlay is requested, we'll try to play after the video loads in onPlayerReady
     };
@@ -157,22 +169,13 @@ export default function Tv2Page() {
             return;
         }
 
-        // Get the current video path without the server URL prefix
-        let currentVideoPath = null;
-        if (currentVideo) {
-            currentVideoPath = currentVideo.replace(videoServerUrl + '/', '');
-        }
-
         // Get all videos except the current one
-        const availableVideos = localVideos.filter(video => {
-            const cleanPath = video.startsWith('/') ? video.substring(1) : video;
-            return cleanPath !== currentVideoPath;
-        });
+        const availableVideos = localVideos.filter(video => video !== currentVideo);
 
         if (availableVideos.length === 0) return;
 
-        // Select a random video from the available videos
-        const randomIndex = Math.floor(Math.random() * availableVideos.length);
+        // Select a random video from the available videos using improved randomization
+        const randomIndex = getRandomIndex(availableVideos.length);
         const randomVideo = availableVideos[randomIndex];
         handleVideoSelect(randomVideo, true); // Auto-play when loading a random video
     };
@@ -217,12 +220,18 @@ export default function Tv2Page() {
                 detailedError += ` ${error.message}`;
             } setPlayerError(detailedError);
         }
-    };
-
-    const onPlayerReady = () => {
+    }; const onPlayerReady = () => {
         // Keep loading state for a moment after video is ready
         setTimeout(() => {
             setIsLoading(false);
+
+            // Initialize volume
+            if (playerRef.current) {
+                const internalPlayer = playerRef.current.getInternalPlayer();
+                if (internalPlayer && typeof internalPlayer.volume === 'number') {
+                    internalPlayer.volume = volume;
+                }
+            }
 
             // If autoplay was requested (isPlaying is true), try to start playing
             if (isPlaying) {
@@ -271,22 +280,59 @@ export default function Tv2Page() {
     const handleSeekChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const time = parseFloat(e.target.value);
         setProgress(time);
-    };
-
-    const handleSeekMouseUp = (e: React.MouseEvent<HTMLInputElement>) => {
+    }; const handleSeekMouseUp = (e: React.MouseEvent<HTMLInputElement>) => {
         const time = parseFloat((e.target as HTMLInputElement).value);
         playerRef.current?.seekTo(time);
-    }; useEffect(() => {
+    };
+
+    const updatePlayerVolume = useCallback((newVolume: number) => {
+        if (playerRef.current) {
+            const internalPlayer = playerRef.current.getInternalPlayer();
+            if (internalPlayer && typeof internalPlayer.volume === 'number') {
+                internalPlayer.volume = newVolume;
+            }
+        }
+    }, []);
+
+    const handleVolumeUp = useCallback(() => {
+        setVolume(prevVolume => {
+            const newVolume = Math.min(maxVolume, prevVolume + volumeStepSize);
+            updatePlayerVolume(newVolume);
+            return newVolume;
+        });
+    }, [maxVolume, volumeStepSize, updatePlayerVolume]);
+
+    const handleVolumeDown = useCallback(() => {
+        setVolume(prevVolume => {
+            const newVolume = Math.max(minVolume, prevVolume - volumeStepSize);
+            updatePlayerVolume(newVolume);
+            return newVolume;
+        });
+    }, [minVolume, volumeStepSize, updatePlayerVolume]);
+
+    const handleVolumeChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+        const newVolume = parseFloat(e.target.value);
+        setVolume(newVolume);
+        updatePlayerVolume(newVolume);
+    }, [updatePlayerVolume]);
+
+    useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
             if (e.code === 'Space') {
                 e.preventDefault();
                 handleTogglePlayPause();
+            } else if (e.code === 'ArrowUp') {
+                e.preventDefault();
+                handleVolumeUp();
+            } else if (e.code === 'ArrowDown') {
+                e.preventDefault();
+                handleVolumeDown();
             }
         };
 
         document.addEventListener('keydown', handleKeyDown);
         return () => document.removeEventListener('keydown', handleKeyDown);
-    }, [isPlaying]);
+    }, [isPlaying, handleVolumeUp, handleVolumeDown, updatePlayerVolume]);
 
     // Add timer to check for 15 and 45 minute marks
     // useEffect(() => {
@@ -343,12 +389,12 @@ export default function Tv2Page() {
                                         }
                                     }
                                 }
-                            }}
-                            onDuration={onPlayerDuration}
+                            }} onDuration={onPlayerDuration}
                             onReady={onPlayerReady}
                             onPlay={() => setIsPlaying(true)}
                             onPause={() => setIsPlaying(false)}
                             onEnded={handleLoadRandomVideo} // Add this line
+                            volume={volume}
                             config={{
                                 file: {
                                     forceVideo: true,
@@ -405,9 +451,35 @@ export default function Tv2Page() {
                             aria-label={isPlaying ? "Pause video" : "Play video"}
                         >
                             {isPlaying ? "⏸︎ Pause" : "▶ Play"}
-                        </button>)}
-
-                        <button onClick={handleLoadRandomVideo}>Something Else</button>
+                        </button>)}                        <button onClick={handleLoadRandomVideo}>Something Else</button>                        <div className="volume-grid">
+                            <span className="volume-label">Volume {Math.round(volume * 100)}%</span>
+                            <button
+                                onClick={handleVolumeUp}
+                                className="volume-btn up"
+                                aria-label="Increase volume"
+                                disabled={volume >= maxVolume}
+                            >
+                                ▲
+                            </button>
+                            <button
+                                onClick={handleVolumeDown}
+                                className="volume-btn down"
+                                aria-label="Decrease volume"
+                                disabled={volume <= minVolume}
+                            >
+                                ▼
+                            </button>
+                            <input
+                                type="range"
+                                min={minVolume}
+                                max={maxVolume}
+                                step={volumeStepSize}
+                                value={volume}
+                                onChange={handleVolumeChange}
+                                className="volume-slider"
+                                aria-label="Volume level"
+                            />
+                        </div>
 
                         <NotificationButtons />
 

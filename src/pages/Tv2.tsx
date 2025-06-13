@@ -369,6 +369,10 @@ export default function Tv2Page() {
     // Handler for close (X) button
     const handleShowOverlay = () => {
         setShowOverlay(true);
+        if (isPlaying) {
+            setIsPlaying(false);
+            stopPlaying();
+        }
     };
 
     // Handler for mouse movement to hide overlay with delay

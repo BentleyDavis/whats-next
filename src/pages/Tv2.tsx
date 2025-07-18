@@ -3,7 +3,7 @@ import ReactPlayer from 'react-player';
 import './Tv2.css'; // Import CSS file for styles
 // import { sendNotification } from '../utils/notifications';
 import { appConfig } from '@/appConfig';
-import NotificationButtons from '@/components/NotificationButtons';
+// import NotificationButtons from '@/components/NotificationButtons';
 import { useLocalStorage } from '@uidotdev/usehooks';
 
 // Server configuration

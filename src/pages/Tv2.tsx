@@ -548,7 +548,7 @@ export default function Tv2Page() {
                             />
                         </div>
 
-                        <NotificationButtons />
+                        {/* <NotificationButtons /> */}
 
 
                     </div>
